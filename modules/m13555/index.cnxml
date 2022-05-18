@@ -1,0 +1,184 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml">
+    <title>Functions in MATLAB and the Groove Station</title>
+    <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>3fd0c695-9f19-405c-8242-bf7c3dc7a645</md:uuid>
+</metadata>
+
+
+<content>
+    <section id="title_and_intro">
+        <title>Introduction</title>
+        <para id="intro">
+            In this lab, you will learn about MATLAB function files, which we will refer to as m-files and have the file extension <code>*.m</code>, the same as script files.  You will create a number of functions for manipulating sound signals to create a groove (a short song).  
+        </para>
+        
+        <para id="intro2">          
+            The difference between a function and a script is that functions can return values and take parameters, while scripts are simply a collection of commands.  Unlike script files, any variables created in the function are not available after the function has run, that is, the variables are active inside the scope of the function, and the variables cannot be accessed out-of-scope.  The MATLAB on-line help system has a nice write-up about functions and how to handle various things like returning more than one value, checking the number of arguments, etc. To learn more, type the following commands and read the online help:
+        </para>
+        
+        <code display="block" id="idp13666976">
+&gt;&gt; help function
+&gt;&gt; help script
+        </code>
+
+        <para id="moreIntro">
+            You need to use a text editor to create function files.  MATLAB has an internal editor that you can start by clicking "File" and then "New" "m-file".  You can also use other editors such as <code>Notepad</code> on the PC's, and <code>pico</code>, <code>emacs</code>, or <code>vi</code> on Unix machines. 
+        </para>
+        
+        <note type="note" id="idp9341920">
+            Remember that in order to run custom scripts or functions, the MATLAB working directory needs to be set to the location of those files.
+        </note>
+        
+    </section>
+    
+    <section id="soundinmatlab">
+        <title>Sound in MATLAB</title>
+        <para id="soundmatlabintro">Download the sound samples from the <link document="m13854">sound resources</link> page and save them to your working directory.  Use <code>wavread</code> to load <code>.wav</code> files, and use <code>load</code> to load <code>.mat</code> files.  Plot each one in turn, and try to guess what it will sound like (the name might help).
+                        
+        </para><para id="element-679">On a computer, sounds are represented digitally, which means that only samples of the signal at fixed time intervals are stored.  We'll learn more about this later.  For now you just need to know that the time interval Ts (or equivalently the sampling rate Fs=1/Ts) is something you need to keep track of for playing sounds.</para><para id="element-688">Now play each sound. The goal is to learn how the time domain signal sounds. Use the sound command to play a sound signal. You must specify the playback sample rate (Fs), which will be the same as the sample rate of the sound samples on the web site (they are 8000 Hz). For example, if you wanted to play a sound called bell and its sample rate was 8000 Hz, then you would enter the following command,
+
+            <code display="block" id="idp15760608">&gt;&gt; Fs=8000;
+&gt;&gt; sound(bell, Fs);
+            </code>    
+
+If you use a different value for Fs, you will effectively be doing time scaling.</para><para id="element-809">When working with sound in MATLAB, it is important to remember that the values of the audio signals are in the range [-1, 1].
+Keep this in mind when you are writing your functions.  Your functions should expect inputs with values in the range [-1, 1] and anything out of that range will be clipped when you play the sound.  
+        </para>
+    </section>
+        
+    <section id="functionfiles">
+        <title>Function Files</title>
+        <para id="numTwo1">Before we can create our groove, we need to make functions that will allow us to modify the sound signals in various ways.  After all, wouldn't it be boring to make a groove out of the same note over and over again?  Let's create some functions that will let us time scale, reverse, delay, fade, and repeat a sound, and mix two sounds together.
+        </para>
+        
+        <para id="element-459">There are many functions built into MATLAB. One that will be useful here is <code>fliplr</code>, which is a one step way of time reversing a signal. Try this with the bell sound.</para><para id="element-372">Another function that we created for you is <link resource="timescale.m">timescale.m</link>, which you can use to speed up or slow down a signal. Download it and give it a try. Notice that it also changes the pitch of a sound -- why?  </para><para id="numTwo12">Download the function <link resource="fade.m">fade.m</link>, make sure you save it as <code>fade.m</code>.  Start MATLAB, and go to the directory where you saved the function.  You can see and change your current directory at the top of the MATLAB screen.  Enter "help fade" at the MATLAB prompt. If you did everything correctly, you should see the help text (in the <code>.m</code> file) in response
+            to <code>help fade</code>. Notice that we've now added a new command to MATLAB
+            that can be used as if it were a built-in function.
+        
+        </para>
+
+        <para id="element-478">Enter the following commands at the MATLAB prompt:</para><code display="block" id="idp9709120">&gt;&gt; time = 0:.01:1;
+&gt;&gt; y = cos(time .* pi .* 25);
+&gt;&gt; plot(time, fade(y));
+        </code>
+        
+        
+        
+        <para id="audiostuff">You can see in the plot that fade does indeed fade-out the cosine wave.  You can use this function on audio signals as well.   
+        </para>
+        
+        <exercise id="fadefunction">
+            <problem id="idp10433952">       
+                <title>Fader</title>
+                <para id="numTwo3">
+                    <list list-type="enumerated" id="yeslistsaregreat"><item>
+                            Modify the fade function so that you can adjust the slope of the ramp which will affect the level of the fade.  Use the variable <code>level</code> (which is already in the parameter list for you in the function) to represent the strength of the fade as a decimal fraction.  The function should make sure that the value is between 0 and 1.
+                        </item>
+                        <item>
+                            Like in the code example above, plot your function with the cosine wave to see its effect.  Throughout this lab you may find it helpful to plot functions (use the plot command).
+                        </item>
+                        <item>
+                            Demonstrate to the TA that your fade function works.
+                        </item>
+                    </list>
+                </para>
+            </problem>
+        </exercise>
+
+        <exercise id="repeaterfunction">
+            <problem id="idp10063936">       
+                <title>Repeater</title>
+                <para id="f64324afaz"><list list-type="enumerated" id="yeslistsaregreat34"><item>
+                            Create a function that repeats a sound N times.  Use a <code>for</code> loop for this.  Inside the <code>for</code> loop you will need to concatenate sound signals.  For example, if you have two vectors <code>x</code> and <code>y</code>, you can concatenate them like this:
+                            
+                            <code display="block" id="idp7935168">
+&gt;&gt; x = [1 4 2 2 3];
+&gt;&gt; y = [5 8 3 9 0];
+&gt;&gt; x = [x y];
+                            </code>         
+                            
+                            The first line of your function might look like this:
+                            
+                            <code display="block" id="idm159392">
+function [ out ] = repeat(in, N)
+                            </code>         
+                        </item>
+                        <item>
+                        Demonstrate your repeater using an N specified by the TA.
+                        </item>
+                        <item>
+                        Optional: Add an argument that let's you insert silence in between each repetition.
+                        </item>
+                    </list>
+                </para>
+            </problem>
+        </exercise>
+    </section>
+
+        
+        <exercise id="delayfunction">
+            <problem id="idp1324336">       
+                <title>Delay (Shift)</title>
+                <para id="numTwo4">
+                    <list list-type="enumerated" id="yeslistsaregreat2"><item>
+                            Create a function to time-delay a signal.  Because we are working with digital data, you can do this by simply adding zeros (zero pad) in the front.  The inputs to the function should be the signal and the amount of time-delay.  The number of zeros to add will depend on the time-delay and the sample rate.  The sound signals from the resource page have a sample rate of 8,000 Hz, but it is good coding style not to assume this and to still have the sample rate (Fs) be an input to the function in case you wanted to change it later.
+                        </item>
+                        <item>
+                            Demonstrate to the TA that your delay function works by plotting the original and delayed signal together with the subplot command.
+                        </item>
+                    </list>
+                </para>
+            </problem>
+        </exercise>
+
+        
+        <exercise id="mixerfunction">
+            <problem id="idp6791456">       
+                <title>Mixer</title>
+                <para id="numTwo5">
+                    <list list-type="enumerated" id="yeslistsaregreat3"><item>
+                            Create a function that adds two sound vectors together; your function should be able to handle inputs that are not the same size.  The output values cannot be outside of the range [-1, 1], so you will have to re-scale them.  One option is to re-scale the summed sound if it goes out of this range.  You may want to look at the source code to the <code>soundsc</code> function for a way to do this. What happens if you let the sounds go out of this range and you try to play them with the <code>sound</code> command?
+                            <note id="idm361072">
+                                You can view the source code to most MATLAB functions by using the command <code>type function_name</code>.
+                            </note>
+                        </item>
+                        <item>
+                            Demonstrate to the TA that your mixer function works by playing a mix of two sounds.
+                        </item>
+                    </list>
+                </para>
+            </problem>
+        </exercise>
+    
+        
+    <section id="groovestation">
+        <title>Groove Station</title>
+        <para id="g23455234e">
+            In order to create a groove, you're going to need some instruments.  The groove will be made up of some sound samples modified in any way you want and concatenated together to make one long sound vector.  Use only the sound samples from the <link document="m13854">sound resources</link> page.
+        </para>             
+        
+        
+        
+        <exercise id="morefuncgs54tions">
+            <problem id="idp8366000">
+            <title>Make Your Groove</title>       
+                <para id="g324afaz">
+                    <list list-type="enumerated" id="sg4s4sw4">
+                        <item>
+                            Create a script (not a function) to build your groove.  You can use any combination of the above functions, or even create additional functions if you want.  Use concatenation to combine the sounds together to make your groove.  When you are finished save your groove with the <code>wavwrite</code> command (Remember to specify the sample rate (Fs), which for the sounds on the resource page is 8000 Hz).
+                        </item>
+                        <item>
+                            Your groove should be between 10 and 30 seconds long.
+                        </item>
+                        <item>
+                            Plot your newly created groove signal.
+                        </item>
+                        <item>
+                            Demonstrate your groove to the TA. Explain how you created it.
+                        </item>
+                    </list>
+                </para>
+            </problem>
+        </exercise>
+    </section>
+</content>
+</document>

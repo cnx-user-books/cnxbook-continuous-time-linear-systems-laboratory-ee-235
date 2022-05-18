@@ -1,0 +1,387 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML">
+  <title>Filtering Periodic Signals</title>
+  <metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m14481</md:content-id>
+  <md:title>Filtering Periodic Signals</md:title>
+  <md:abstract>This development of these labs was supported by the National Science
+Foundation under Grant No. DUE-0511635. Any opinions, conclusions or
+recommendations expressed in this material are those of the authors and do
+not necessarily reflect the views of the National Science Foundation.</md:abstract>
+  <md:uuid>e53ea31d-9738-42c3-a52f-ac4cf7c06040</md:uuid>
+</metadata>
+<content>
+    <section id="intro">
+        <title>Introduction</title>
+        <para id="para-intro">In this lab, we will look at the effect of filtering signals using a frequency domain implementation of an LTI system, i.e., multiplying the Fourier transform of the input signal with the frequency response of the system. In particular, we will filter sound signals, and investigate both low-pass and high-pass filters. Recall that a low-pass filter filters out high frequencies, allowing only the low frequencies to pass through. A high-pass filter does the opposite.
+        </para>
+    </section>
+    <section id="matlabcommands">
+        <title>MATLAB Commands and Resources</title>
+        <list id="highpasslist-01"><item>
+                <code>help &lt;command&gt;</code>, online help for a command.
+            </item>
+<item>
+                <code>fft</code>, Fast Fourier Transform.
+            </item>
+            
+            <item>
+                <code>ifft</code>, Inverse Fourier Transform.
+            </item>
+            <item>
+                <code>sound</code>, plays sound unscaled (clips input to [-1,1]).
+            </item>
+            <item>
+                <code>soundsc</code>, plays sound scaled (scales input to [-1,1]).
+            </item>
+            <item>
+                <code>wavread</code>, reads in WAV file.  The sampling rate of the WAV file can also be retrieved, for example, <code>[x, Fs] = wavread('filename.wav')</code>, where <code>x</code> is the sound vector and <code>Fs</code> is the sampling rate.
+            </item>
+        </list>
+        <para id="resources">
+            All of the sounds for this lab can be downloaded from the <link document="m13854">Sound Resources</link> page.
+        </para>
+    </section>
+    <section id="fftoverview">
+        <title>Transforming Signals to the Frequency Domain and Back</title>
+        <para id="fft-001">When working in MATLAB, the continuous-time Fourier transform cannot be done by the computer exactly, but a digital approximation is done instead.  The approximation uses the discrete Fourier transform (more on that in EE 341).
+There are a couple important differences between the discrete Fourier transforms on the computer and the continuous Fourier transforms you are working with in class: finite frequency range and discrete frequency samples. The frequency range is related to the sampling frequency of the signal.  In the example below, where we find the Fourier transform of the "fall" signal, the sampling frequency is <code>Fs=8000</code>, so the frequency range is [-4000,4000] Hz (or 2*pi times that for w in radians).  The frequency resolution depends on the length of the signal (which is also the length of the frequency representation).
+        </para>
+        <para id="fft-002">
+The MATLAB command for finding the Fourier transform of a signal is <code>fft</code> (for Fast Fourier Transform (FFT)). In this class, we only need  the default version.
+            <code id="id1165528466212" display="block">
+&gt;&gt; load fall     %load in the signal
+&gt;&gt; x = fall;
+&gt;&gt; X = fft(x);
+           </code>
+            The <code>fft</code> command in MATLAB returns an uncentered result. To view the frequency content in the same way as we are used to seeing it in class, you need to plot only the first half of the result (positive frequencies only) OR use the MATLAB command <code>fftshift</code> which toggles between centered and uncentered versions of the frequency domain.  The code below will allow you to view the frequency content both ways.
+            <code id="id1165527739964" display="block">&gt;&gt; N = length(x);
+&gt;&gt; pfreq = [0:N/2]*Fs/N;     % index of positive frequencies in fft
+&gt;&gt; Xpos=X(1:N/2+1);          % subset of fft values at positive frequencies
+&gt;&gt; plot(pfreq,abs(Xpos));    % plot magnitude of fft at positive frequencies
+&gt;&gt; figure;
+&gt;&gt; freq = [-(N/2-1):N/2]*Fs/N;  % index of positive AND negative freqs
+&gt;&gt; plot(freq,abs(fftshift(X))); % fftshift actually SWAPS halves of X here. See help.
+                   % Convince yourself of why it does this to match up with freq!
+            </code>
+Note that we are using <code>abs</code> in the plot to view the magnitude since the Fourier transform of the signal is complex valued. (Type <code>X(2)</code> to see this.  Note that X(1) is the DC term, so this will be real valued.) 
+        </para>
+        <para id="fft-003">
+Try looking at the frequency content of a few other signals.  Note that the fall signal happens to have an even length, so N/2 is an integer.  If the length is odd, you may have indexing problems, so it is easiest to just omit the last sample, as in <code>x=x(1:length(x)-1);</code>.
+        </para>
+        <para id="fft-004">After you make modifications of a signal in the frequency domain, you typically want to get back to the time domain. The MATLAB command <code>ifft</code> will accomplish this task.
+            <code id="id1165530264751" display="block">
+&gt;&gt; xnew = real(ifft(X));
+            </code>
+You need the <code>real</code> command because the inverse Fourier transform returns a vector that is complex-valued, since some changes that you make in the frequence domain could result in that. If your changes maintain complex symmetry in the frequency domain, then the imaginary components should be zero (or very close), but you still need to get rid of them if you want to use the <code>sound</code> command to listen to your signal.
+        </para>
+  </section>
+    <section id="lpf">
+        <title>Low-pass Filtering</title>
+        <para id="lowpass-001">
+            An ideal low-pass filter eliminates high frequency components entirely, as in:
+            <m:math display="block"><m:semantics><m:mrow><m:msubsup><m:mi>H</m:mi><m:mi>L</m:mi><m:mrow>
+                 <m:mi>i</m:mi><m:mi>d</m:mi><m:mi>e</m:mi><m:mi>a</m:mi><m:mi>l</m:mi>                             </m:mrow></m:msubsup><m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mrow><m:mo>{</m:mo> <m:mrow><m:mtable>
+                 <m:mtr><m:mtd><m:mn>1</m:mn>
+                  </m:mtd><m:mtd>
+                   <m:mrow><m:mrow><m:mo>|</m:mo> <m:mi>ω</m:mi> <m:mo>|</m:mo></m:mrow><m:mo>≤</m:mo><m:mi>B</m:mi></m:mrow>
+                  </m:mtd></m:mtr>
+                 <m:mtr><m:mtd><m:mn>0</m:mn>
+                  </m:mtd><m:mtd>
+                   <m:mrow><m:mrow><m:mo>|</m:mo> <m:mi>ω</m:mi> <m:mo>|</m:mo></m:mrow><m:mo>&gt;</m:mo><m:mi>B</m:mi></m:mrow>
+                  </m:mtd>
+                 </m:mtr>
+
+                </m:mtable>
+               </m:mrow> <m:mo>}</m:mo></m:mrow>
+              </m:mrow>
+             <m:annotation encoding="MathType-MTEF">
+             MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadIeadaqhaaWcbaGaamitaaqaaiaadMgacaWGKbGaamyzaiaadggacaWGSbaaaOGaaiikaiabeM8a3jaacMcacqGH9aqpdaGadaqaauaabeqaciaaaeaacaaIXaaabaWaaqWaaeaacqaHjpWDaiaawEa7caGLiWoacqGHKjYOcaWGcbaabaGaaGimaaqaamaaemaabaGaeqyYdChacaGLhWUaayjcSdGaeyOpa4JaamOqaaaaaiaawUhacaGL9baaaaa@525A@</m:annotation>
+             </m:semantics>
+            </m:math>
+
+            A real low-pass filter typically has low but non-zero values for
+
+            <m:math>
+             <m:semantics>
+              <m:mrow>
+               <m:mrow><m:mo>|</m:mo> <m:mrow>
+                <m:msub>
+                 <m:mi>H</m:mi>
+                 <m:mi>L</m:mi>
+                </m:msub>
+                <m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo>
+               </m:mrow> <m:mo>|</m:mo></m:mrow>
+              </m:mrow>
+             <m:annotation encoding="MathType-MTEF">
+             MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaamaaemaabaGaamisamaaBaaaleaacaWGmbaabeaakiaacIcacqaHjpWDcaGGPaaacaGLhWUaayjcSdaaaa@3DFE@</m:annotation>
+             </m:semantics>
+            </m:math>
+
+            at high frequencies, and a gradual (rather than an immediate) drop in magnitude as frequency increases. The simplest (and least effective) low-pass filter is given by (e.g. using an RC circuit):
+
+            <m:math display="block">
+             <m:semantics>
+              <m:mrow>
+               <m:msub>
+                <m:mi>H</m:mi>
+                <m:mi>L</m:mi>
+               </m:msub>
+               <m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mfrac>
+                <m:mi>α</m:mi>
+                <m:mrow>
+                 <m:mi>α</m:mi><m:mo>+</m:mo><m:mi>j</m:mi><m:mi>ω</m:mi>
+                </m:mrow>
+               </m:mfrac>
+               <m:mo>,</m:mo><m:mtext> </m:mtext><m:mi>α</m:mi><m:mo>=</m:mo><m:mtext>cutoff frequency</m:mtext><m:mtext>.</m:mtext>
+              </m:mrow>
+             <m:annotation encoding="MathType-MTEF">
+             MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadIeadaWgaaWcbaGaamitaaqabaGccaGGOaGaeqyYdCNaaiykaiabg2da9maalaaabaGaeqySdegabaGaeqySdeMaey4kaSIaamOAaiabeM8a3baacaGGSaGaaeiiaiabeg7aHjabg2da9iaabogacaqG1bGaaeiDaiaab+gacaqGMbGaaeOzaiaabccacaqGMbGaaeOCaiaabwgacaqGXbGaaeyDaiaabwgacaqGUbGaae4yaiaabMhacaqGUaaaaa@5620@</m:annotation>
+             </m:semantics>
+            </m:math>
+        </para>
+
+        <para id="lowpass-002">This low-pass filter can be implemented in MATLAB using what we know about the Fourier transform.  Remember that multiplication in the Frequency domain equals convolution in the time domain.  If our signal and filter are both in the frequency domain, we can simply multiply them to produce the result of the system.
+            <m:math display="block">
+             <m:semantics>
+              <m:mtable columnalign="left">
+               <m:mtr>
+                <m:mtd>
+                 <m:mi>y</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mi>x</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo><m:mo>∗</m:mo><m:mi>h</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo>
+                </m:mtd>
+               </m:mtr>
+               <m:mtr>
+                <m:mtd>
+                 <m:mi>Y</m:mi><m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mi>X</m:mi><m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo><m:mi>H</m:mi><m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo>
+                </m:mtd>
+               </m:mtr>
+              </m:mtable>
+
+             <m:annotation encoding="MathType-MTEF">
+             MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOabaeqabaGaamyEaiaacIcacaWG0bGaaiykaiabg2da9iaadIhacaGGOaGaamiDaiaacMcacqGHxiIkcaWGObGaaiikaiaadshacaGGPaaabaGaamywaiaacIcacqaHjpWDcaGGPaGaeyypa0JaamiwaiaacIcacqaHjpWDcaGGPaGaamisaiaacIcacqaHjpWDcaGGPaaaaaa@4EBC@</m:annotation>
+             </m:semantics>
+            </m:math>
+Below is an example of using MATLAB to perform low-pass filtering on the input signal <code>x</code> with the FFT and the filter definition above.
+        </para>
+
+        <para id="lowpass-003">The cutoff of the low-pass filter is defined by the constant <code>a</code>.  The low-pass filter equation above defines the filter <code>H</code> in the frequency domain.  Because the definition assumes the filter is centered around w = 0, the vector <code>w</code> is defined as such.
+
+            <code id="id1165530587155" display="block">&gt;&gt; load fall     %load in the signal
+&gt;&gt; x = fall;
+&gt;&gt; X = fft(x);   % get the Fourier transform (uncentered)
+
+&gt;&gt; N = length(X);
+&gt;&gt; a = 100*2*pi;
+&gt;&gt; w = (-N/2+1:(N/2))*Fs/N*2*pi;  % centered frequency vector (rad/s)
+&gt;&gt; H = a ./ (a + i*w);            % generate centered sampling of H
+&gt;&gt; plot(w/(2*pi),abs(H))          % w converted back to Hz for plotting
+           </code>
+
+The plot will show the form of the frequency response of a system that we are used to looking at, but we need to shift it to match the form that the <code>fft</code> gave us for x.
+            <code id="id1165529314634" display="block">
+&gt;&gt; Hshift = fftshift(H);     % uncentered version of H
+&gt;&gt; Y = X .* Hshift';         % filter the signal
+           </code>
+
+            
+            <note id="id1165527661929">If you are having problems multiplying vectors together, make sure that the vectors are the exact same size.  Also, even if two vectors are the same length, they may not be the same size.  For example, a row vector and column vector of the same length cannot be multiplied element-wise unless one of the vectors is transposed.  The <code>'</code> operator transposes vectors/matrices in MATLAB.
+            </note>
+
+            Now that we have the output of the system in the frequency domain, it must be transformed back to the time domain using the inverse FFT.  Play the original and modified sound to see if you can hear a difference.  Remember to use the sampling frequency Fs.
+            <code id="id1165530587176" display="block">
+&gt;&gt; y = real(ifft(Y));
+&gt;&gt; sound(x, Fs)        % original sound
+&gt;&gt; sound(y, Fs)        % low-pass-filtered sound
+            </code>
+
+            The filter reduced the signal amplitude, which you can hear when you use the <code>sound</code> command but not with the <code>soundsc</code> which does automatic scaling. Replay the sounds with the <code>soundsc</code> and see what other differences there are in the filtered vs. original signals.  What changes could you make to the filter to make a greater difference?
+
+<note id="id1165528132021">
+Sometimes, you may want to amplify the signal so that it has the same height as the original, e.g., for plotting purposes.
+
+            <code id="id1165529752582" display="block">
+&gt;&gt; y = y * (max(abs(x))/max(abs(y)))
+            </code>
+</note>
+
+        </para>
+
+        <exercise id="lowpasssound">
+            <problem id="id1165528120372">
+                <title>Low-pass Filtering with Sound</title>
+                <para id="ex_lpsnd-01">Use <code>wavread</code> to load the sound castanets44m.wav. Perform low-pass filtering with the filter defined above, starting with <code>a = 500*2*pi</code>, but also try different values.
+                </para>
+                <para id="ex_lpsnd-02">Play the original and the low-passed version of the sound.  Plot their frequency content (Fourier  transforms) as well.
+                </para>
+            </problem>
+        </exercise>
+        <exercise id="lowpasstrain">
+            <problem id="id1165527752179">
+                <title>OPTIONAL: Low-pass Filtering</title>
+                <para id="ex_lptrain-01">
+                    <list id="lowpasslist-01" list-type="enumerated">
+                        <item>
+                            Create an impulse train as the input signal <code>x(t)</code> using the following MATLAB command,
+                            <code id="id1165533041460" display="block">
+&gt;&gt; x = repmat([zeros(1, 99) 1], 1, 5);
+                            </code>
+                        </item>
+                        <item>
+                            Use the low-pass filter defined earlier to low-pass the impulse train.  Choose a cutoff of 20.
+                        </item>
+                        <item>
+                            Plot the two signals <code>x(t)</code> and <code>y(t)</code> separately using the subplot command.  These should be plotted versus the time vector. Label the axes and title each graph appropriately.
+                        </item>
+                        <item>
+                            Look at the plots.  Can you explain what is happening to the spike train?
+                        </item>
+                    </list>
+                </para>
+            </problem>
+        </exercise>
+    </section>
+    <section id="hpf">
+        <title>High-pass Filtering</title>
+
+        <para id="highpass-01">
+            An ideal high-pass filter eliminates low frequency components entirely, as in:
+            <m:math display="block">
+             <m:semantics>
+              <m:mrow>
+               <m:msubsup>
+                <m:mi>H</m:mi>
+                <m:mi>H</m:mi>
+                <m:mrow>
+                 <m:mi>i</m:mi><m:mi>d</m:mi><m:mi>e</m:mi><m:mi>a</m:mi><m:mi>l</m:mi>
+                </m:mrow>
+               </m:msubsup>
+               <m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mrow><m:mo>{</m:mo> <m:mrow>
+                <m:mtable>
+                 <m:mtr>
+                  <m:mtd>
+                   <m:mn>0</m:mn>
+                  </m:mtd>
+                  <m:mtd>
+                   <m:mrow>
+                    <m:mrow><m:mo>|</m:mo> <m:mi>ω</m:mi> <m:mo>|</m:mo></m:mrow><m:mo>&lt;</m:mo><m:mi>B</m:mi>
+                   </m:mrow>
+                  </m:mtd>
+                 </m:mtr>
+                 <m:mtr>
+                  <m:mtd>
+                   <m:mn>1</m:mn>
+                  </m:mtd>
+                  <m:mtd>
+                   <m:mrow>
+                    <m:mrow><m:mo>|</m:mo> <m:mi>ω</m:mi> <m:mo>|</m:mo></m:mrow><m:mo>≥</m:mo><m:mi>B</m:mi>
+                   </m:mrow>
+                  </m:mtd>
+                 </m:mtr>
+
+                </m:mtable>
+               </m:mrow> <m:mo>}</m:mo></m:mrow>
+              </m:mrow>
+             <m:annotation encoding="MathType-MTEF">
+             MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadIeadaqhaaWcbaGaamisaaqaaiaadMgacaWGKbGaamyzaiaadggacaWGSbaaaOGaaiikaiabeM8a3jaacMcacqGH9aqpdaGadaqaauaabeqaciaaaeaacaaIWaaabaWaaqWaaeaacqaHjpWDaiaawEa7caGLiWoacqGH8aapcaWGcbaabaGaaGymaaqaamaaemaabaGaeqyYdChacaGLhWUaayjcSdGaeyyzImRaamOqaaaaaiaawUhacaGL9baaaaa@5263@</m:annotation>
+             </m:semantics>
+            </m:math>
+
+
+            A real high-pass filter typically has low but non-zero values for
+            <m:math>
+             <m:semantics>
+              <m:mrow>
+               <m:mrow><m:mo>|</m:mo> <m:mrow>
+                <m:msub>
+                 <m:mi>H</m:mi>
+                 <m:mi>L</m:mi>
+                </m:msub>
+                <m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo>
+               </m:mrow> <m:mo>|</m:mo></m:mrow>
+              </m:mrow>
+             <m:annotation encoding="MathType-MTEF">
+             MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaamaaemaabaGaamisamaaBaaaleaacaWGmbaabeaakiaacIcacqaHjpWDcaGGPaaacaGLhWUaayjcSdaaaa@3DFE@</m:annotation>
+             </m:semantics>
+            </m:math>
+            at low frequencies, and a gradual (rather than an immediate) rise in magnitude as frequency increases. The simplest (and least effective) high-pass filter is given by (e.g. using an RC circuit):
+
+            <m:math display="block">
+             <m:semantics>
+              <m:mrow>
+               <m:msub>
+                <m:mi>H</m:mi>
+                <m:mi>H</m:mi>
+               </m:msub>
+               <m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mn>1</m:mn><m:mo>−</m:mo><m:msub>
+                <m:mi>H</m:mi>
+                <m:mi>L</m:mi>
+               </m:msub>
+               <m:mo stretchy="false">(</m:mo><m:mi>ω</m:mi><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mn>1</m:mn><m:mo>−</m:mo><m:mfrac>
+                <m:mi>α</m:mi>
+                <m:mrow>
+                 <m:mi>α</m:mi><m:mo>+</m:mo><m:mi>j</m:mi><m:mi>ω</m:mi>
+                </m:mrow>
+               </m:mfrac>
+               <m:mo>,</m:mo><m:mtext> </m:mtext><m:mi>α</m:mi><m:mo>=</m:mo><m:mtext>cutoff frequency</m:mtext><m:mtext>.</m:mtext>
+              </m:mrow>
+             <m:annotation encoding="MathType-MTEF">
+             MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadIeadaWgaaWcbaGaamisaaqabaGccaGGOaGaeqyYdCNaaiykaiabg2da9iaaigdacqGHsislcaWGibWaaSbaaSqaaiaadYeaaeqaaOGaaiikaiabeM8a3jaacMcacqGH9aqpcaaIXaGaeyOeI0YaaSaaaeaacqaHXoqyaeaacqaHXoqycqGHRaWkcaWGQbGaeqyYdChaaiaacYcacaqGGaGaeqySdeMaeyypa0Jaae4yaiaabwhacaqG0bGaae4BaiaabAgacaqGMbGaaeiiaiaabAgacaqGYbGaaeyzaiaabghacaqG1bGaaeyzaiaab6gacaqGJbGaaeyEaiaab6caaaa@5F6C@</m:annotation>
+             </m:semantics>
+            </m:math>
+This filter can be implemented in the same way as the low pass filter above.
+        </para>
+
+        <exercise id="highpasssound">
+            <problem id="id1165530587354">
+                <title>High-pass Filtering with Sound</title>
+                <para id="ex_hpsnd-01">
+                    The high-pass filter can be implemented in MATLAB much the same way as the low-pass filter.  Perform high-pass filtering with the filter defined above on the sound castanets44m.wav.  Start with <code>a = 2000*2*pi</code>, but also try different values.
+                </para>
+                <para id="ex_hpsnd-02">
+                    Play the original and the high-passed version of the sound.  The filtered signal may be to be scaled so that both have the same range on the Y-axis.  Plot their frequency responses as well.
+                </para>
+            </problem>
+        </exercise>
+    </section>
+
+    <section id="moreproblems">
+        <title>Sound Separation</title>
+        <exercise id="filterproblem">
+            <problem id="id1165529963177">
+                <title>Sound Filtering</title>
+                    <list id="filterprb-01"><item>
+                            Kick'n Retro 235 Inc. recorded a session of a trumpet and drum kit together for their new release.  The boss doesn't like the bass drum in the background and wants it out.  Unfortunately, there was a malfunction in the mixing board and instead of having two separate tracks for the drums and the trumpet, the sounds mixed together in one track.  In order to get this release out on time you will have to use some filtering to eliminate the bass drum from the sound.  There is not enough time to bring the drummer and trumpet player back in the studio to rerecord the track.
+                        </item>
+                        <item>
+                            <link resource="mixed.wav">Click here to download the mixed.wav sound</link> (<code>Fs</code> = 8000 Hz).  The mixed sound is created from bassdrum.wav, hatclosed.wav, and shake.mat.
+                        </item>
+                        <item>
+                            Try to do something easy but approximate first, and then, if you have more time, see how clean you can get the sound. You may find it helpful to look at the Fourier domain representation of the sounds, but you may not use the individual sounds in your solution.
+                        </item>
+                        <item>
+                            Now try to eliminate the trumpet sound, leaving only the drums left in the sound.
+                        </item>
+                        <item>
+                            Hint: use high-pass and low-pass filtering.
+                        </item>
+                        <item>
+                            Another hint: If you want a more powerful filter, you can try using multiple a/(a+jw) terms in series. Each extra term raises the order of the filter by one and higher order filters have a faster drop-off outside of their passing region.
+                         </item></list>
+            </problem>
+        </exercise>
+
+        <exercise id="exDesignProb">
+            <problem id="id1165530584377">
+                <title>BONUS PROBLEM: Sound Filtering</title>
+                    <list id="filterprob-02"><item>
+                            Imagine you recorded a trumpet and rainstick together, so that you have the signal, <code>mixedsig = shake + 10*rainstick</code>.
+                        </item>
+                        <item>
+                            It turns out the producer thinks the rainstick is too new-age and wants it out of the recording. Pretend you do not have the original signals shake or rainstick.  Can you take the signal <code>mixedsig</code> and process it to get (approximately) only the trumpet sound (shake) out?  Try to do something easy but approximate first, and then if you have more time, see how good a reproduction of shake you can get. You may find it helpful to look at Fourier domain of the sounds, but you may not use rainstick.mat or shake.mat in your solution.
+                        </item>
+                    </list>
+            </problem>
+        </exercise>
+    </section>
+</content>
+
+</document>

@@ -1,0 +1,567 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Fourier Series and Gibbs Phenomenon</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>8ef92951-be1e-40f4-a50a-a307785a0608</md:uuid>
+</metadata>
+
+<content>
+
+    <section id="introduction_header">
+        <title>Introduction</title>
+        <para id="delete_me">
+            In this lab, we will look at the Fourier series representation of periodic signals using MATLAB.  In particular, we will study the truncated Fourier series reconstruction of a periodic function. 
+        </para>
+    </section>
+
+    <section id="usefulcmds">
+        <title>Some Useful MATLAB Commands</title>
+        <list id="usefulcommandlist">
+            <item>
+                <code>abs</code>, compute the complex magnitude.
+            </item>
+            <item>
+                <code>angle</code>, compute the phase angle.
+            </item>
+            <item>
+                <code>clear</code>, clears all variables.
+            </item>
+            <item>
+                <code>help &lt;command&gt;</code>, online help.
+            </item>
+            <item>
+                <code>whos</code>, list all variables and their sizes.
+            </item>
+        </list>
+    </section>
+<section id="sigsynth">
+        <title>Signal Synthesis</title>
+        <para id="adsjkl4590a">We will see in exercise 3 that we can approximate a square wave with the Fourier series, but first let us approximate something more interesting, say a musical instrument?  Many instruments produce very periodic waveforms. 
+        </para>
+        <exercise id="probsigsynth">
+            <problem id="idm11878880">
+            <title>Synthesizer</title>
+                <list list-type="enumerated" id="sigsynthproblist"><item>
+                        Create a script file called <code>sigsynth.m</code> to put your code in for this problem.  
+                    </item>
+                    <item>    
+                        Download the trumpet sound sample <code>trumpet.mat</code> from the <link document="m13854">Sound Resources</link> page. The sample rate, <code>Fs</code>, of the trumpet is 11,025 Hz.  Play this sound with the <code>sound</code> command (remember to include the correct sample rate).
+                    </item>
+                    <item>
+                        Plot only a small section of the trumpet sound to show three or so periods (try 100 samples or so).  Does it looks the same at any time in the sound?
+                    </item>                 
+                    <item>
+                        View the frequency spectrum of this sound by entering the following commands,
+                        <code display="block" id="idm9760496">Fs = 11025;             % our sample rate is 11025 Hz
+Y = fft(trumpet, 512);  % take the fft of trumpet
+Ymag = abs(Y);          % take the mag of Y
+f = Fs * (0:256)/512;   % get a meaningful axis 
+plot(f, Ymag(1:257));   % plot Ymag (only half the points are needed)
+xlabel('Frequency (Hz)')
+ylabel('Magnitude')
+
+                        </code>             
+                        You should now see a series of peaks (these are the harmonics of the instrument).       
+                    </item>
+                    <item>
+                        We will synthesize the instrument using only the peak information.  You can use the "data cursor" tool in MATLAB's figure window to easily read graph data.  Write down the frequency and its strength (magnitude) for five to ten of the strongest peaks.
+                    </item>
+                    <item>
+                        Create a function called <code>addcosines.m</code> that takes in three vectors: time vector <code>t</code>, frequency vector <code>freq</code>, and magnitude vector <code>mag</code>.  Have your new function use a for-loop to add together cosines, one for each frequency/magnitude pair in the <code>freq</code> and <code>mag</code> vectors.  Remember to normalize your output vector after you add up all the cosines (the output should be between -1 and 1), like in the <link document="m13555">Functions in MATLAB and the Groove Station</link> lab.  Use the data you collected from the frequency plot of the trumpet sound with your new function to sum cosines at the noted frequencies.
+                    </item>
+                    <item>
+                        Here are some hints for the above.  Use a for-loop to create a cosine at each frequency in the freq vector.  Your cosine function should look something like this, <code>mag(i)*cos(2*pi*freq(i)*t);</code>.  Remember your time vector will have the form 0:1/Fs:time_in_seconds.  
+                        <note id="idm13235632">
+                            The command <code>soundsc</code> will normalize the input before it plays the sound.
+                        </note>         
+                        For example, if you had two harmonics, one at 100 Hz with magnitude 1 and another at 150 Hz with magnitude 2, then your vectors will be,
+                        <code display="block" id="idm5763376">t = 0:1/Fs:1;  % one second time vector at 11025 Hz
+freq = [100 150];
+mag = [1 2];
+                        </code>         
+                    </item>
+                    <item>
+                        Play trumpet and your new synthesized sound.  Do they sound the same?  Use subplot to plot a small section of your new synthesized sound along with the trumpet sound, does it look the same?  Save your plot as <code>synthwaves.tif</code>.
+                    </item>
+                    <item>
+                        Try synthesizing the sound with fewer frequencies, then try more frequencies.  How does this affect the sound of our synthesized trumpet?
+                    </item>
+                    <item>
+                        You will need to show the TA the following files:
+                        <code display="block" id="idm19536608">
+sigsynth.m
+addcosines.m
+synthwaves.tif
+
+                        </code>
+                    </item>                 
+                </list>
+            </problem>
+        </exercise>
+        <exercise id="probsigsynth2">
+            <problem id="idm11295552">
+            <title>That funny phase</title>
+                <para id="phase32378">
+                    You probably noticed in the last problem that even though the wave forms looked fairly different, the sound was similar.  Let's look into this a bit deeper with a simpler sound.
+                </para>
+                <list list-type="enumerated" id="sigsynthproblist2"><item>
+                        Create a script file called <code>phasefun.m</code> to put your code in for this problem.  
+                    </item>
+                    <item>
+                        Pick two harmonic frequencies and generate a signal from two cosines at these frequencies added together and call it <code>sig1</code>.  Use Fs = 8000 (remember that you can reproduce only frequencies that are less than <code>Fs/2</code>).
+                    </item>
+                    <item>
+                        Now generate a second signal called <code>sig2</code> exactly the same as the first one, except time delay the second cosine by a half cycle (half of its period).
+                    </item>
+                    <item>
+                        Use subplot to show a few periods of both signals, do they look different?  Save the plot as <code>phasesigs.tif</code>.  What did the time delay do to the phase?
+                    </item>
+                    <item>
+                        Play each signal with <code>soundsc</code>, do they sound different?
+                    </item>
+                    <item>
+                        Redo <code>sig2</code> with a few different delays and compare the sound to the first signal.
+                    </item>
+                    <item>
+                        Create a <code>sig3</code> that is one cosine at some frequency.  Now add <code>sig3</code> with a timed delayed version of itself and call it <code>sig4</code>. Use a quarter cycle delay.
+                    </item>
+                    <item>
+                        Use subplot and plot a few periods of <code>sig3</code> and <code>sig4</code>.  Play them with <code>soundsc</code>, do they sound different to you?
+                    </item>
+                    <item>
+                        What is suggested about our hearing capabilities from this experiment?
+                    </item>
+                    <item>
+                        You will need to show the TA the following files:
+                        <code display="block" id="idm10909040">
+phasefun.m
+phasesigs.tif
+                        </code>
+                    </item>                 
+                </list>
+            </problem>
+        </exercise>
+    </section>    
+    
+
+    <section id="Assignment">
+        <title>Truncated Fourier Series</title> 
+        <para id="trun0001">
+            In this section, we'll reconstruct the periodic function <code>x(t)</code>, shown in Figure 1, by synthesizing a periodic signal from a variable number of Fourier Series coefficients, and observe similarities and differences in the synthesized signal.  
+        </para>
+        <figure id="element-103">
+            <media id="idp154960" alt=""><image src="../../media/Fig_PeriodicSignal.jpg" mime-type="image/jpeg"/></media>
+            <caption>Periodic Signal</caption>
+        </figure>
+        <exercise id="prob125389">
+            <problem id="idm8197696">
+            <title>Gibbs phenomena</title>
+                <list list-type="enumerated" id="assignmentList">
+                    <item>
+                        Create a script file called <code>gibbs.m</code> to put your code in for this problem.  
+                    </item>
+                    <item>
+                        Click <link resource="Ck.m">here</link> to download the MATLAB function <code>Ck.m</code>.  Take a look at the contents of the function.  This function takes one argument 
+                        <m:math>
+                          <m:ci>
+                            k
+                          </m:ci>
+                        </m:math> 
+                        , and creates the 
+                        <m:math>
+                          <m:ci>
+                            k
+                          </m:ci>
+                        </m:math>
+                        th Fourier series coefficient for the squarewave above:
+                        <equation id="Ck">
+                        <m:math>
+                         <m:semantics>
+                          <m:mrow>
+                           <m:msub>
+                            <m:mi>C</m:mi>
+                            <m:mi>k</m:mi>
+                           </m:msub>
+                           <m:mo>=</m:mo><m:mrow><m:mo>{</m:mo> <m:mrow>
+                            <m:mtable columnalign="left">
+                             <m:mtr columnalign="left">
+                              <m:mtd columnalign="left">
+                               <m:mn>0</m:mn>
+                              </m:mtd>
+                              <m:mtd columnalign="left">
+                               <m:mrow>
+                                <m:mtext>if </m:mtext><m:mi>k</m:mi><m:mo>=</m:mo><m:mn>0</m:mn><m:mo>,</m:mo><m:mtext> </m:mtext><m:mi>k</m:mi><m:mtext> even</m:mtext>
+                               </m:mrow>
+                              </m:mtd>
+                             </m:mtr>
+                             <m:mtr columnalign="left">
+                              <m:mtd columnalign="left">
+                               <m:mrow>
+                                <m:mfrac>
+                                 <m:mn>1</m:mn>
+                                 <m:mrow>
+                                  <m:mi>j</m:mi><m:mi>k</m:mi><m:mi>π</m:mi>
+                                 </m:mrow>
+                                </m:mfrac>
+                                <m:mrow><m:mo>[</m:mo> <m:mrow>
+                                 <m:mi>cos</m:mi><m:mo>⁡</m:mo><m:mrow><m:mo>(</m:mo>
+                                  <m:mrow>
+                                   <m:mfrac>
+                                    <m:mrow>
+                                     <m:mn>2</m:mn><m:mi>k</m:mi><m:mi>π</m:mi>
+                                    </m:mrow>
+                                    <m:mn>3</m:mn>
+                                   </m:mfrac>
+                                   
+                                  </m:mrow>
+                                 <m:mo>)</m:mo></m:mrow><m:mo>−</m:mo><m:mi>cos</m:mi><m:mo>⁡</m:mo><m:mrow><m:mo>(</m:mo>
+                                  <m:mrow>
+                                   <m:mfrac>
+                                    <m:mrow>
+                                     <m:mi>k</m:mi><m:mi>π</m:mi>
+                                    </m:mrow>
+                                    <m:mn>3</m:mn>
+                                   </m:mfrac>
+                                   
+                                  </m:mrow>
+                                 <m:mo>)</m:mo></m:mrow>
+                                </m:mrow> <m:mo>]</m:mo></m:mrow>
+                               </m:mrow>
+                              </m:mtd>
+                              <m:mtd columnalign="left">
+                               <m:mrow>
+                                <m:mtext>if </m:mtext><m:mi>k</m:mi><m:mtext> odd</m:mtext>
+                               </m:mrow>
+                              </m:mtd>
+                             </m:mtr>
+                             
+                            </m:mtable>
+                           </m:mrow> </m:mrow>
+                          </m:mrow>
+                         <m:annotation encoding="MathType-MTEF">
+                         MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadoeadaWgaaWcbaGaam4AaaqabaGccqGH9aqpdaGabaqaauaabaqaciaaaeaacaaIWaaabaGaaeyAaiaabAgacaqGGaGaam4Aaiabg2da9iaaicdacaGGSaGaaeiiaiaadUgacaqGGaGaaeyzaiaabAhacaqGLbGaaeOBaaqaamaalaaabaGaaGymaaqaaiaadQgacaWGRbGaeqiWdahaamaadmaabaGaci4yaiaac+gacaGGZbWaaeWaaeaadaWcaaqaaiaaikdacaWGRbGaeqiWdahabaGaaG4maaaaaiaawIcacaGLPaaacqGHsislciGGJbGaai4BaiaacohadaqadaqaamaalaaabaGaam4Aaiabec8aWbqaaiaaiodaaaaacaGLOaGaayzkaaaacaGLBbGaayzxaaaabaGaaeyAaiaabAgacaqGGaGaam4AaiaabccacaqGVbGaaeizaiaabsgaaaaacaGL7baaaaa@64FA@</m:annotation>
+                         </m:semantics>
+                        </m:math>
+    
+                    </equation>
+    
+                    <m:math>
+                     <m:semantics>
+                      <m:mrow>
+                       <m:msub>
+                        <m:mi>C</m:mi>
+                        <m:mi>k</m:mi>
+                       </m:msub>
+                       <m:mo stretchy="false">(</m:mo><m:mn>1</m:mn><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mstyle scriptlevel="+1">
+                        <m:mfrac>
+                         <m:mrow>
+                          <m:mo>−</m:mo><m:mn>1</m:mn>
+                         </m:mrow>
+                         <m:mrow>
+                          <m:mi>j</m:mi><m:mi>π</m:mi>
+                         </m:mrow>
+                        </m:mfrac>
+                       </m:mstyle>
+                       <m:mo>=</m:mo><m:mn>0</m:mn><m:mo>+</m:mo><m:mi>j</m:mi><m:mn>0.3183</m:mn>
+                      </m:mrow>
+                     <m:annotation encoding="MathType-MTEF">
+                     MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadoeadaWgaaWcbaGaam4AaaqabaGccaGGOaGaaGymaiaacMcacqGH9aqpdaWcbaWcbaGaeyOeI0IaaGymaaqaaiaadQgacqaHapaCaaGccqGH9aqpcaaIWaGaey4kaSIaamOAaiaaicdacaGGUaGaaG4maiaaigdacaaI4aGaaG4maaaa@4758@</m:annotation>
+                     </m:semantics>
+                    </m:math>
+    
+                    .  Plot the magnitude and phase of the 
+                    coefficients 
+                    
+                    <m:math>
+                     <m:semantics>
+                      <m:mrow>
+                       <m:msub>
+                        <m:mi>C</m:mi>
+                        <m:mi>k</m:mi>
+                       </m:msub>                   
+                      </m:mrow>
+                     </m:semantics>
+                    </m:math>
+                    
+                    for
+    
+                    <m:math>
+                     <m:semantics>
+                      <m:mrow>
+                       <m:mi>k</m:mi><m:mo>∈</m:mo><m:mrow><m:mo>{</m:mo> <m:mrow>
+                        <m:mo>−</m:mo><m:mn>10</m:mn><m:mo>,</m:mo><m:mo>−</m:mo><m:mn>9</m:mn><m:mo>,</m:mo><m:mo>…</m:mo><m:mo>,</m:mo><m:mn>9</m:mn><m:mo>,</m:mo><m:mn>10</m:mn>
+                       </m:mrow> <m:mo>}</m:mo></m:mrow>
+                      </m:mrow>
+                     <m:annotation encoding="MathType-MTEF">
+                     MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadUgacqGHiiIZdaGadaqaaiabgkHiTiaaigdacaaIWaGaaiilaiabgkHiTiaaiMdacaGGSaGaeSOjGSKaaiilaiaaiMdacaGGSaGaaGymaiaaicdaaiaawUhacaGL9baaaaa@44B3@</m:annotation>
+                     </m:semantics>
+                    </m:math>
+                    
+                    .  The magnitude and phase should be plotted separately using the subplot command, with the magnitude plotted in the top half of the window and the phase in the bottom half. Place frequency 
+                    
+                    <m:math>
+                     <m:semantics>
+                      <m:mi>w</m:mi>
+                     </m:semantics>
+                    </m:math>
+                    
+                     on the x axis. Use the MATLAB command <code>stem</code> instead of <code>plot</code> to emphasize that the coefficients are a function of integer-valued (not continuous) 
+                     
+                    <m:math>
+                      <m:ci>
+                        k
+                      </m:ci>
+                    </m:math>
+                    
+                    . Label your plots. 
+                    </item>
+                    <item>
+                        Save the graph as <code>Coeff.tif</code>.
+                    </item>
+                    <item>
+                        Write whatever script/function files you need to implement the calculation of the signal
+        
+                        <m:math>
+                          <m:apply>
+                            <m:ci>
+                              <m:mi>x</m:mi>
+                            </m:ci>
+                            <m:ci>t</m:ci>
+                          </m:apply>
+                        </m:math>
+        
+                        with a truncated Fourier series:
+        
+                        <equation id="xhat">
+                            <m:math>
+                              <m:apply>
+                                <m:eq/>
+                                <m:apply>
+                                  <m:ci>
+                                    <m:mi>x</m:mi>
+                                  </m:ci>
+                                  <m:ci>t</m:ci>
+                                </m:apply>
+                                <m:apply>
+                                  <m:sum/>
+                                  <m:bvar>
+                                    <m:ci>k</m:ci>
+                                  </m:bvar>
+                                  <m:lowlimit>
+                                    <m:apply>
+                                      <m:minus/>
+                                      <m:ci>
+                                        <m:msub>
+                                          <m:mi>K</m:mi>
+                                          <m:mi>max</m:mi>
+                                        </m:msub>
+                                      </m:ci>
+                                    </m:apply>
+                                  </m:lowlimit>
+                                  <m:uplimit>
+                                    <m:ci>
+                                      <m:msub>
+                                        <m:mi>K</m:mi>
+                                        <m:mi>max</m:mi>
+                                      </m:msub>
+                                    </m:ci>
+                                  </m:uplimit>
+                                  <m:apply>
+                                    <m:times/>
+                                    <m:ci>
+                                      <m:msub>
+                                        <m:mi>C</m:mi>
+                                        <m:mi>k</m:mi>
+                                      </m:msub>
+                                    </m:ci>
+                                    <m:apply>
+                                      <m:power/>
+                                      <m:ci>e</m:ci>
+                                      <m:apply>
+                                        <m:times/>
+                                        <m:ci>jk</m:ci>
+                                        <m:ci>
+                                          <m:msub>
+                                            <m:mi>ω</m:mi>
+                                            <m:mn>0</m:mn>
+                                          </m:msub>
+                                        </m:ci>
+                                        <m:ci>t</m:ci>
+                                      </m:apply>
+                                    </m:apply>
+                                  </m:apply>
+                                </m:apply>
+                                <m:apply>
+                                  <m:sum/>
+                                  <m:bvar>
+                                    <m:ci>k</m:ci>
+                                  </m:bvar>
+                                  <m:lowlimit>
+                                    <m:cn>0</m:cn>
+                                  </m:lowlimit>
+                                  <m:uplimit>
+                                    <m:ci>
+                                      <m:msub>
+                                        <m:mi>K</m:mi>
+                                        <m:mi>max</m:mi>
+                                      </m:msub>
+                                    </m:ci>
+                                  </m:uplimit>
+                                  <m:apply>
+                                    <m:times/>
+                                    <m:cn>2</m:cn>
+                                    <m:apply>
+                                      <m:abs/>
+                                      <m:ci>
+                                        <m:msub>
+                                          <m:mi>C</m:mi>
+                                          <m:mi>k</m:mi>
+                                        </m:msub>
+                                      </m:ci>
+                                    </m:apply>
+                                    <m:mo>cos</m:mo>
+                                    <m:apply>
+                                      <m:plus/>
+                                      <m:apply>
+                                        <m:times/>
+                                        <m:ci>k</m:ci>
+                                        <m:ci>
+                                          <m:msub>
+                                            <m:mi>ω</m:mi>
+                                            <m:mn>0</m:mn>
+                                          </m:msub>
+                                        </m:ci>
+                                        <m:ci>t</m:ci>
+                                      </m:apply>
+                                      <m:ci>
+                                        <m:msub>
+                                          <m:mrow>
+                                            <m:mo>∠</m:mo>
+                                            <m:mi>C</m:mi>
+                                          </m:mrow>
+                                          <m:mi>k</m:mi>
+                                        </m:msub>
+                                      </m:ci>
+                                    </m:apply>
+                                  </m:apply>
+                                </m:apply>
+                              </m:apply>
+                            </m:math>               
+                        </equation>
+        
+                        for a given 
+        
+                        <m:math>
+                          <m:ci>
+                            <m:msub>
+                              <m:mi>K</m:mi>
+                              <m:mo>max</m:mo>
+                            </m:msub>
+                          </m:ci>
+                        </m:math>
+        
+                        <note id="idm2031600">
+                            You can avoid numerical problems and ensure a real answer if you use the cosine form.  For this example, 
+                            
+                            <m:math>
+                             <m:semantics>
+                              <m:mrow>
+                               <m:msub>
+                                <m:mi>w</m:mi>
+                                <m:mn>0</m:mn>
+                               </m:msub>
+                               <m:mo>=</m:mo><m:mn>1</m:mn>
+                              </m:mrow>
+                             <m:annotation encoding="MathType-MTEF">
+                             MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadEhadaWgaaWcbaGaaGimaaqabaGccqGH9aqpcaaIXaaaaa@398F@</m:annotation>
+                             </m:semantics>
+                            </m:math>.
+                        </note>
+                    </item>
+                    <item>  
+                        Produce plots of 
+    
+                        <m:math>
+                          <m:apply>
+                            <m:ci>
+                              <m:mi>x</m:mi>
+                            </m:ci>
+                            <m:ci>t</m:ci>
+                          </m:apply>
+                        </m:math>
+                         for 
+                        
+                        <m:math>
+                          <m:apply>
+                            <m:in/>
+                            <m:ci>t</m:ci>
+                            <m:interval>
+                              <m:apply>
+                                <m:minus/>
+                                <m:cn>5</m:cn>
+                              </m:apply>
+                              <m:cn>5</m:cn>
+                            </m:interval>
+                          </m:apply>
+                        </m:math>
+                        
+                        for each of the following cases:
+                        
+                        <m:math>
+                          <m:ci>
+                            <m:msub>
+                              <m:mi>K</m:mi>
+                              <m:mo>max</m:mo>
+                            </m:msub>
+                          </m:ci>
+                        </m:math>
+                        
+                        = 5; 15; and 30. For all the plots, use as your time values the MATLAB vector <code>t=-5:.01:5</code>. Stack the three plots in a single figure using the <code>subplot</code> command and include your name in the title of the figure. Save the figure as <code>FourTrunc.tif</code>
+                    </item>
+                    <item>
+                        Add clear comments describing what the files do. You will need to show the TA the following files:
+                        <code display="block" id="idm1719072">
+gibbs.m
+Coeff.tif
+FourTrunc.tif
+                        </code>
+                    </item>
+                </list>
+            </problem>
+        </exercise>
+        <para id="gibbs001">
+            As you add more cosines you'll note that you do get closer to the square wave (in terms of squared error), but that at the edges there is some undershoot and overshoot that becomes shorter in time, but the magnitude of the undershoot and overshoot stay large. This persistent undershoot and overshoot at edges is called Gibbs Phenomenon. 
+        </para>
+        <para id="gibbs002">
+            In general, this kind of "ringing" occurs at discontinuities if you try to synthesize a sharp edge out of too few low frequencies. Or, if you start with a real signal and filter out its higher frequencies, it is "as if" you had synthesized the signal from low frequencies. Thus, low-pass filtering (a filter that only passes low-frequencies) will also cause this kind of ringing. 
+        </para>
+        <para id="gibbs003">
+            For example, when compressing an audio signal, higher frequencies are usually removed (that is, the audio signal is low-pass filtered).  Then, if there is an impulse edge or "attack" in the music, ringing will occur.  However, the ringing (called "pre-echo" in audio) can be heard only before the attack, because the attack masks the ringing that comes after it (this masking effect happens in your head).  High-quality MP3 systems put a lot of effort into detecting attacks and processing the signals to avoid pre-echo. 
+        </para>        
+    </section>
+
+    <section id="turnin">
+        <title>What to Show the TA</title>
+        <para id="turninPara">
+            Show the TA ALL m-files that you created or edited and the files below.  
+            <code display="block" id="idm1779376">
+gibbs.m
+Coeff.tif
+FourTrunc.tif
+sigsynth.m
+addcosines.m
+synthwaves.tif
+phasefun.m
+phasesigs.tif
+any wav files created
+            </code>         
+        </para>
+    </section>
+
+    <section id="extra">
+        <title>Fun Links</title>        
+        <para id="element-620">
+            An applet <link url="http://www.phy.ntnu.edu.tw/ntnujava/viewtopic.php?t=33">here</link> provides a great interface for listening to sinusoids and their harmonics.  There are some well-known auditory illusions associated with the perception of pitch <link url="http://physics.mtsu.edu/~wmr/julianna.html">here</link>.
+        </para>
+    </section>
+    
+</content>
+</document>

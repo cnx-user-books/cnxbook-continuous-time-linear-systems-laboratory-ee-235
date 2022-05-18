@@ -1,0 +1,149 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Investigation of Aliasing Effects</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>9882e7a1-b8fc-43c3-a079-633241b825f0</md:uuid>
+</metadata>
+<content>
+    <section id="intro">
+        <title>Introduction</title>
+        <para id="paraintro">Aliasing literally means "by a different name" and is used to explain the effect of under-sampling a continuous signal, which causes frequencies to show up as different frequencies.  This aliased signal is the signal at a different frequency.  This is usually seen as higher frequencies being aliased to lower frequencies.  For a 1d signal in time, the aliased frequency components sound lower in pitch. In 2d space, such as images, this can be observed as parallel lines in pinstripe shirts aliasing into large wavy lines.  For 2d signals that vary in time, an example of aliasing would be viewing propellers on a plane that seem to be turning slow when they are actually moving at very high speeds.
+        </para>
+        
+        <note id="idm651744">The Nyquist sampling rate is twice the highest frequency of the signal.  This is the minimum rate needed to prevent aliasing.</note>
+    </section>
+        
+    
+    <section id="signalaliasing">
+        <title>Signals and Aliasing</title>
+        <para id="sigpara">
+            In Figure 1 a 500Hz cosine signal is shown in red, and an under-sampled version of the signal in blue.
+        </para>
+        <figure id="fig1">
+            <media id="idp10457520" alt=""><image src="../../media/alias.jpg" mime-type="image/jpeg"/></media>
+            <caption>Aliased Signal</caption>
+        </figure>
+        <exercise id="aliasingsound">
+            <problem id="idp3286320">       
+                <para id="sigparaprob">
+                    To see the effects of aliasing on a 1kHz cosine signal create an  over-sampled, under-sampled, and critically-sampled version of the signal.
+                </para>
+                <list list-type="enumerated" id="aliasingsoundlist"><item>
+                        Plot a cosine at 1kHz showing at least twenty periods.  Use a step size (sampling period) of 1/10kHz.  This will be our over-sampled signal.  Try playing this signal with <code>soundsc</code>.  How many samples are needed to make the sound last 2 seconds if the step size is 1/10kHz?
+                    </item>
+                    <item>
+                        Plot the critically-sampled version by applying what you know about Nyquist. Make sure the plot contains at least twenty periods and that you sample at a non-zero point.  Listen to this signal with <code>soundsc</code>, does it sound the same?
+                    </item>
+                    <item>
+                        Plot the under-sampled version.  Make sure the plot contains at least twenty periods.  Listen to this signal with <code>soundsc</code>, how does it sound now?
+                    </item>
+                    <item>
+                        Plot all three signals stacked on top of each other using subplot. Note that the plot command uses straight line interpolation, so your plots will not look smooth like Figure 1 (which actually uses a much finer sampling period an knowledge of the aliased frequency to generate the smooth undersampled result).
+                    </item>
+                </list>
+            </problem>
+        </exercise>
+    </section>
+
+                    
+    <section id="temporalasliasing">
+        <title>Temporal Aliasing</title>
+        <para id="EE235_goes_western">Have you ever seen an old western movie and noticed that the wagon wheels appear to turn backwards even though the coach is moving forward?  This phenomenon is sometimes referred to as the wagon-wheel effect, but is really an effect of temporal aliasing.  You can see the same effect easily on anything with a spoked wheel, such as wheels on a stage coach and airplane propellers.
+        </para>
+        <para id="temporalaliasing_how">
+            Wagon-wheels, stage coaches, horses, and airplane propellers?? What's this have to do with signal processing?  Actually, quite a lot, not the wagon-wheels directly, but how the images of the wagon-wheels are captured.  The video you watch from a movie or tv show is actually sampled in time (hence temporal).  Typically a movie is captured at 24 frames per second (FPS).
+        </para>
+
+        <exercise id="tempasliasingprob">
+            <problem id="idm301568">       
+                <para id="para-34823">
+                    Now it's your turn to be the cinematographer.  For this problem you will take an image of a wagon-wheel and "capture" a MATLAB movie at different frame rates of the wheel rotating.  After the movie is made, you will be able to play it back, and if everything worked, be able to see the wheel spin.
+                </para>
+                <para id="ptemp-01">
+                    A movie of a rotating wheel is a signal in time, and at each instant in time, instead of just one point (like a normal x(t) signal), you have a whole image defined. Thus, if you have an image of an arrow rotating, Figure 2, where the image rotates ten times per second, then the period is 1/10 second, because every 1/10 second the image (signal) is at the same value again. Thus image(t+n/10) = image(t) for all integers n.
+                </para>
+		        <figure id="fig2">
+		            <media id="idm3262784" alt=""><image src="../../media/arrows.jpg" mime-type="image/jpeg"/></media>
+		            <caption>Frames of rotating arrow.</caption>
+		        </figure>
+                <para id="ptemp-02">If an image rotates at 10 Hz (10 rotations per second), then what is the Nyquist sampling rate so that you can reconstruct the temporal signal? Recall that the signal will be critically sampled when using a sampling rate that is twice the highest frequency in the signal (20 Hz, in this case).  Anything above that will be over-sampled, and fewer samples/second will be under-sampled.
+                </para>
+                
+                <para id="ptemp-04">
+                    Check your understanding: standard film is captured at 24 frames per second. What's the highest frequency of motion that can be reconstructed without aliasing?
+                </para>             
+                <para id="para-33af3">
+                    Create three movies to show the wheel being over-sampled (appears to be rotating clockwise), under-sampled (appears to be rotating counter-clockwise), and critically-sampled (appears stationary).  In each case rotate the wheel at the same rate and only change the frame rate in the <code>movie2avi</code> command (keep the FPS under 30).
+                </para>
+                <para id="para-34d3">
+                    Write a Matlab function named <code>wheel.m</code> to create a movie showing the spokes image (download it <link resource="spokes.tif">here</link>) rotate clockwise at a constant speed.  The function should take parameters to change the frame rate and the speed of the rotation.  Save the movies as <code>wheel-oversample.avi</code>, <code>wheel-undersample.avi</code>, and <code>wheel-critsample.avi</code>.  Label the plot with the frame rate used for each of the movies and the degrees per frame.  Here some tips below to help you get started.  
+                </para>
+                <list id="tempaliasingproblist">
+                    <item>
+                        You will need to use the following Matlab commands: 
+                        <code>imread</code>,
+                        <code>imshow</code>,
+                        <code>imrotate</code>,
+                        <code>getframe</code>, and
+                        <code>movie2avi</code>.
+                        <note id="idp2934128">Passing a negative angle in the <code>imrotate</code> command rotates clockwise, and a positive angle rotates counterclockwise.</note>
+                        Another useful command you can use to help formatting labels for the figure is <code>sprintf</code>.  For more information use the help system in Matlab.
+                    </item>
+                    <item>
+                        Use <code>myImageRotated = imrotate(myImage, theta, 'bilinear', 'crop')</code> for the rotate command.
+                    </item>
+                    <item>
+                        One way to do this is rotate the image by a number of degrees for each frame.  The angle can be split into two variables; <code>degPerFrame</code> will be our speed and <code>theta</code> will be the actual number of degrees to rotate for the rotate command.  Remember to change <code>degPerFrame</code> to reflect the same speed when changing the frame rate.  Now we can setup a <code>for</code> loop something like this,
+                        <code display="block" id="idp2636992">                                         
+for i = 1:FPS*TIME
+    % rotate the image
+
+    % display the image
+    
+    % label the plot showing the FPS and speed of the wheel
+    
+    pause(0.01)                     % allows time for the plot to draw
+    myMovie(i) = getframe(gcf);     % Capture the frame
+    theta = theta + degPerFrame;    % Calculate the angle for next frame
+end                     
+
+% save the avi file
+                        </code>
+                    </item>
+                    <item>
+                        Can you use <code>degPerFrame</code> to relate to degrees per second?  Given some frame rate, how many degrees pass each frame to make a rotation of 
+                        <m:math>
+                         <m:semantics>
+                          <m:mrow>
+                           <m:msup>
+                            <m:mrow>
+                             <m:mn>360</m:mn>
+                            </m:mrow>
+                            <m:mo>∘</m:mo>
+                           </m:msup>   
+                          </m:mrow>
+                         </m:semantics>
+                        </m:math>
+                         take 1 second?  At a given frame rate, can you calculate the number of frames are needed to last a given amount of time, say 3 seconds?.
+                    </item>
+                    <item>
+                        Once your <code>for</code> loop is done, you will need to save the movie as an avi to watch it.  Use the <code>movie2avi</code> function to save the movie.  Why can't we just watch the wheel as it is drawing in the <code>for</code> loop?
+                    </item>
+                </list>
+                <para id="diffpic">
+                    Now try the same problem with a different picture of your choice.  Can you get it to appear to move backwards?  Save the movie as <code>myMovie.avi</code>.
+                </para>
+                <para id="turninstuff">
+                    Show the TA the following files:
+                    <code display="block" id="idm2850768">
+wheel.m
+wheel-oversample.avi
+wheel-undersample.avi
+wheel-critsample.avi
+myMovie.avi
+                    </code>
+                </para>
+
+            </problem>
+        </exercise>
+    </section>
+</content>
+</document>

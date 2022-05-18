@@ -1,0 +1,47 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Sound resources</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>ff853f37-c8d5-4c37-ae92-3435f570e04e</md:uuid>
+</metadata>
+<content>
+    <section id="soundfiles">
+        <title>Sound Resources</title>
+        <para id="files-01">
+            Sound files in MATLAB and WAV format at 8000 Hz.
+            <list id="matlist">
+                <item> <link resource="blueslick.mat">blueslick.mat</link> </item>
+                <item> <link resource="doit.mat">doit.mat</link> </item>
+                <item> <link resource="fall.mat">fall.mat</link> </item>
+                <item> <link resource="shake.mat">shake.mat</link> </item>
+                <item> <link resource="tag.mat">tag.mat</link> </item>
+                <item> <link resource="rainstick.mat">rainstick.mat</link> </item>
+                <item> <link resource="bassdrum.wav">bassdrum.wav</link> </item>
+                <item> <link resource="bleeep.wav">bleeep.wav</link> </item>
+                <item> <link resource="hatclosed.wav">hatclosed.wav</link> </item>
+                <item> <link resource="snare.wav">snare.wav</link> </item>
+            </list>
+            The University of Washington department of Electrical Engineering thanks Matt Swihart for the trumpet recordings and Tigh Bradley for the drum samples.
+        </para>
+        <para id="files-02">
+            Sound files in MATLAB and WAV format at 44100 Hz.
+            <list id="matlist2">
+                <item> <link resource="castanets44m.wav">castanets44m.wav</link> (modified from Prof. Sheila Hemami, Cornell University)</item>
+            </list>
+        </para>
+    </section>
+    <section id="soundfilesspecial">
+        <title>Additional Sound Resources</title>
+        <section id="special_fouriergibbs">
+            <title>Sound files for Fourier Series and Gibbs Phenomenon lab</title>
+            <list id="listspecial_fouriergibbs">
+                <item> <link resource="trumpet.mat">trumpet.mat</link> 11025 Hz (UW EE thanks trumpeter Ed Castro for this clip)</item>
+            </list>
+        </section>
+        <section id="special_filtering">
+            <title>Sound files for Filtering Periodic Signals lab</title>
+            <list id="listspecial_filtering">
+                <item> <link resource="mixed.wav">mixed.wav</link> 8000 Hz </item>
+            </list>
+        </section>
+    </section>
+</content>
+</document>

@@ -1,0 +1,175 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Convolution</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>2eb51558-c79c-4e73-a394-d5fa684b3a40</md:uuid>
+</metadata>
+<content>
+    <section id="introduction">
+        <title>Introduction</title>
+        <para id="intropara">
+            In this lab, we will explore convolution and how it can be used with signals such as audio.
+        </para>
+        <para id="intropara2">Since we are working on a computer, we are working with finite-length, discrete-time versions of signals. It is important to note that convolution in continuous-time systems cannot be exactly replicated in a discrete-time system, but using MATLAB's <code>conv</code> function for convolution, we can explore the basic effects and gain insight into what is going on. (You can learn more about discrete-time convolution in the UW EE 341 class.)</para><para id="element-358">When you are explicitly working with discrete-time signals, you would plot them with <code>stem</code>.  However, since we want to think of these as continuous time, we'll still use the <code>plot</code> command.  An artifact that you may notice is that discontinuities (as in a step function) are not instantaneous -- they have a small slope in the plot.  In addition, you need to represent impulses with the height in discrete time equal to the area in continuous time. </para><para id="element-161">When you want to play or plot the discrete-time signal, you need to specify the time increment Ts between samples. As you found in the previous lab, when playing a sound you specify Fs=1/Ts. (Fs is set for you when you load a sound.) When plotting, you need to define a time vector, e.g. t=[0:Ts:end] where end=(length-1)*Ts.</para>
+    </section>
+
+    <section id="usefulcmds">
+        <title>Some Useful MATLAB Commands</title>
+        <list id="usefulcommandlist"><item>
+                <code>whos</code>, list all variables and their sizes.
+            </item>
+            <item>
+                <code>clear</code>, clears all variables.
+            </item>
+            <item>
+                <code>zeros</code>, creates a vector (or matrix) of zeros.
+            </item>
+            <item>
+                <code>ones</code>, creates a vector (or matrix) of ones.
+            </item>
+            <item>
+                <code>conv</code>, convolves two signals.
+            </item>
+            <item>
+                <code>soundsc</code>, plays an audio signal, normalizing if the values are greater than +/-1. Requires the sampling rate.
+            </item>
+        </list>
+    </section>
+
+    <section id="conv">
+        <title>Convolution</title>
+        <para id="convintro">MATLAB has a function called <code>conv(x,h)</code> that you can use to convolve two discrete-time functions <code>x(n)</code> and <code>h(n)</code>.  It assumes that the time steps are the same in both cases. The input signals must be finite length, and the result of the convolution has a length that is the sum of the lengths of the two signals you are convolving (actually L1+L2-1).
+        </para>
+		<list list-type="enumerated" id="exp1"><item>
+            	Recall that a linear time-invariant system is completely described by its impulse function. In MATLAB, the impulse response must be discrete.  For example, consider the system with impulse response
+                <code display="block" id="idm4540128">h = [1 zeros(1,20) .5 zeros(1,10)];
+                </code>
+            	Plot the impulse response using the <code>plot</code> command.
+        	</item>
+        	<item>
+        		Consider an input to the system,
+        		<code display="block" id="idm4187648">x = [0 1:10 ones(1,5)*5 zeros(1,40)];
+        		</code>
+        		Plot the input with the <code>plot</code> command.
+        	</item>
+        	<item>
+            	Use the command <code>conv</code> to convolve <code>x</code> and <code>h</code> like this,
+            	<code display="block" id="idp2459888">y = conv(x, h);
+            	</code>
+            	Use subplot to show the impulse response, input, and output of the convolution.  Note that you need to add zeros to the end of x and h (to make them the same length as y) or define a time vector for each signal in order to make the timing comparable in the different subplots.
+        	</item>
+        	<item>
+            	Every non-zero coefficient of the impulse response <code>h</code>, acts as an echo.  When you convolve the input <code>x</code> and impulse response <code>h</code>, you add up all the time-shifted and scaled echoes. Try making the second coefficient negative.  How does this change the final result?
+        	</item>
+		</list>
+            
+            
+        <exercise id="prob2"><problem id="idp3095312">       
+                <title>Convolution and Echo</title>
+                <list list-type="enumerated" id="yeslistsaregreat2"><item>
+                        Create a new script for this problem.  Download the trumpet jazz lick "fall" <link resource="fall.mat">here</link>, and then load it into MATLAB using <code>load('fall')</code> and plot it. Use <code>whos</code> to see that the variables <code>fall</code> and <code>Fs</code> are created for you. (The sampling rate (Fs) for this signal should be 8000 Hz.)
+                    </item>
+                    <item>
+                        Use the following commands to convolve the following impulse response <code>h</code>, with the trumpet sound.
+                        <code display="block" id="idm1713968">Fs = 8000     % for this example
+h = [1 zeros(1,10000) .25 zeros(1,1000)];
+y = conv(fall, h);
+plot(y)
+soundsc(y, Fs)
+                        </code>
+                    </item>
+                    <item>
+                        What if the second echo (in <code>h</code>) is a negative coefficient?  When you play it, it should not sound different since your ear is not sensitive to that sort of modification (simple phase change).
+                    </item>
+                     <item>
+                        Now let's build a system that delays the echo for a quarter second by inserting <code>Fs/4</code> zeros before the second impulse: 
+                        <code display="block" id="idm2537472">
+h = [1 zeros(1, round(Fs/4)) 0.25 zeros(1,1000)];
+                        </code>                     
+                         Pass the <code>fall</code> input signal through the system to get the output <code>y</code>:
+                        <code display="block" id="idp614896">
+y = conv(h, fall);
+                        </code>                     
+                        How do the input and output signals compare in the above step? (Look and listen).   Experiment with different numbers of zeros, and try repeating this with some of the built-in MATLAB sounds.
+                        <note id="idp1297440">Some built-in sounds in MATLAB are <code>chirp</code>, <code>gong</code>, <code>handel</code>, <code>laughter</code>, <code>splat</code>, and <code>train</code>.  Load them with the <code>load</code> command and the sound data will be loaded into the variable <code>y</code> and the sampling rate in <code>Fs</code>.  
+                        </note>
+                    </item>
+                    <item>
+                        Show the TA your script file.  You should be able to run it and have it generate any plots and sounds.
+                        <note id="idm3901136">
+                        	You can use the <code>pause</code> command to pause MATLAB until a key is pressed to prevent it from playing all your sounds at once.
+                        </note>
+                    </item>                 
+                </list>            
+            </problem>
+        </exercise>
+
+
+        <exercise id="prob3"><problem id="idp6650960">       
+                <title>Convolution and Smoothing</title>
+                <list list-type="enumerated" id="yeslistsaregreat3"><item> Build a box impulse response:
+                     <code display="block" id="idp684192">
+h2=[ones(1,50)/50 zeros(1,20)];
+</code>
+Create a new signal <code>y2</code> by convolving "fall" with <code>h2</code>
+</item>
+                    <item>
+                        How does the output sound different from the input signal? 
+</item>
+                    <item>
+                        Visually, a difference is that the input signal <code>fall</code> looks like it's centered around value 0, and the system output <code>y2</code> looks like it's more positive.  Let's look more closely. Find the average value of the signal <code>fall</code> (use <code>sum(fall)/length(fall)</code>), and you should see that in fact the <code>fall</code> signal isn't really centered around 0.
+                    </item>
+                    <item>
+                        Next, to see what this system does to the input signal, zoom in on part of the signal:
+                        <code display="block" id="idm9296">subplot(2,1,1), plot(6400:6500, fall(6400:6500))
+subplot(2,1,2), plot(6400:6500, y2(6400:6500))
+                        </code>
+                        The convolved signal should look a little smoother to you.  This is because this impulse response applies a low-pass filter to the signal.  We'll learn more about filters a bit later, but basically the idea is that the original signal is made up of sounds at many different frequencies, and the lower frequencies pass through the system, but the higher frequencies are attenuated.   This affects how it sounds as well as how it looks.                     
+                    </item>
+                </list>            
+            </problem>
+        </exercise>
+
+        
+        <exercise id="boxprob">
+            <problem id="idm1485872">       
+                <title>Box Function</title>                
+                <list id="boxproblist" list-type="enumerated"><item>
+                        Create a new function called <code>unitstep.m</code> in MATLAB.  The function should take two parameters, a time vector that specifies the finite range of the signal and a time shift value.
+                        <note id="idp824128">
+                            Calling <code>unitstep([time],ts)</code> should be equivalent to <code>u(t + ts)</code>
+                        </note>
+                    </item>
+                    <item>
+                        Use the <code>unitstep</code> function to create a box-shaped time signal. Write a new function called <code>boxt.m</code> that creates a box with specified start and end times <code>t1</code> and <code>t2</code>. In other words, your function should take three inputs: scalars <code>t1</code> and <code>t2</code>, and a time vector <code>t</code>, and should output a vector of the same size as <code>t</code>, which contains the values of <code>u(t-t1)-u(t-t2)</code> evaluated at each point in <code>t</code>. 
+                    </item>
+                    <item>          
+                        Create a script file called <code>boxtscript.m</code> that uses the function to create a box that starts at time <code>t = -1</code> and ends at time <code>t = 1</code>, where the signal lasts from time <code>t = -3</code> to <code>t = 3</code>. Generate three different versions of this box using three different time granularities, where the finest granularity has very sharp edges similar to the ideal box and the coarsest granularity has a step size of 0.5. 
+                        
+                        <note id="idp2080720">The different versions should all have the same time span; the difference in the plots should only be at the edges of the box because of artifacts in continuous plotting of a discrete-time signal.
+                        </note>
+                    </item>
+                    <item>
+                        Plot all three versions in one figure using subplot and save it as <code>boxtscript.tif</code>.
+                    </item>
+                    <item>
+                        Time: If <code>u</code> is a vector of length <code>n</code> with time span <code>tu = t1:del:t2</code>, and <code>v</code> is a vector of length <code>m</code> with time span <code>tv = t3:del:t4</code>, and both have the same time step <code>del</code>, then the result of <code>conv(u,v)</code> will be a vector of length <code>n + m - 1</code> with a time span <code>tc = (t1+t3):del:(t2+t4)</code>.                        
+                    </item>
+                    <item>
+                        Using the box function that you wrote in step 2 with a sufficiently fine grained step size (for example, <code>del = 0.01</code>), create box signals from (0,4) and (-1,1), with time span of (-5,10). Find and plot the result of the convolution of the two boxes and save it as <code>convplot.tif</code>. Use the above discussion of Time to create the appropriate time vector in your plot. Verify that the timing of signal rising and falling matches what you expect in theory.
+                    </item>
+                    <item>
+                        Amplitude: In the resulting plot from the previous step, you should notice that the amplitude is much higher than the max of 2 that you would expect from analytically computing the convolution. This is because it is thinking that the length of the box is <code>n</code> rather <code>n del</code>, which impacts the area computation in convolution. To get the correct height, you need to scale by <code>del</code>.  Scale and plot the resulting function, and verify that the height is now 2. Save the figure as <code>scaled.tif</code>
+                    </item>
+                    <item>
+                        Triangle: Design the impulse response for a system <code>h</code> and a system input <code>x</code> such that you get a perfectly symmetric triangle of length 100 as the system output <code>y</code>. Use subplot to plot <code>x</code>, <code>h</code>, and <code>y</code>, and save the plot as <code>tri.tif</code>.
+                    </item>
+                    <item>
+                        Be able to demonstrate your code, show your plots, and play sounds.
+                    </item>                 
+                </list>
+            </problem>
+        </exercise>
+    </section>
+                    
+</content>
+  
+</document>

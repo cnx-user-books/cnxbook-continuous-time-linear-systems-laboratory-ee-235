@@ -1,0 +1,553 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Introduction to MATLAB and Scripts</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>07adbbeb-054e-4b2b-949b-ef7150099ba1</md:uuid>
+</metadata>
+<content>
+<section id="introduction_header">
+    <title>Introduction</title>
+
+    <para id="intropara">
+        The goal of this lab is to provide exercises that will help you get started learning MATLAB. You will learn about the help function, vectors, complex numbers, simple math operations, and 2-D plots. You may find it useful to try some of the built-in demos in Matlab. Type <code>demo</code> to see the choices. In particular, look at the demo on "Basic matrix operations" (under "Mathematics") and on "2-D" plots (under "Graphics").  We will also look at script files in MATLAB, which we will refer to as M-files and have the file extension <code>*.m</code>.
+    </para>
+</section>
+<section id="getstarted">
+    <title>Getting Started</title>
+    <para id="jl324">
+        Start MATLAB by clicking on it in the start menu.  Once MATLAB is running you will see a screen similar to Figure 1.  The command window, (A), is where you can enter commands.  The current working directory, (B), displays the directory that MATLAB will look first for any commands.  For example, if you made a new MATLAB function called <code>myfunc.m</code>, then this will need to be placed in the current working directory.  You can change the working directory by typing it in the box, clicking the "..." button to browse to a folder, or typing <code>cd [directory name]</code> (i.e. <code>cd 'H:\ee235\lab0\'</code>), which is similar to the DOS/Linux cd command).  
+        <note id="idm7025632">
+            MATLAB supports tab completion.  This means that you can type part of a command and then press tab and it will fill in the rest of the command automatically.
+        </note>
+        The workspace displays information about all the variables currently active and is shown in (C).  The files in the current directory can also be displayed in (C) by clicking on the tab labeled <code>Current Directory</code>.  A history of your commands is shown in (D).  If you find that you do not need some of these windows open you can close them by clicking on the small x in that section of the window.
+        <figure id="fig1">
+            <title>The MATLAB GUI</title>
+            <media id="idp6285664" alt=""><image src="../../media/fig_matlab.jpg" mime-type="image/jpeg"/></media>
+            <caption>(a) Command window, (b) working directory, (c) workspace, (d) command history.</caption>
+        </figure>
+    </para>
+    <note type="MATLAB in Linux" id="idp7473568"><label>MATLAB in Linux</label>
+        There are a number of different ways to use MATLAB on Linux.  Typing <code>matlab</code> at the command prompt will run MATLAB in X-Windows (warning, MATLAB in X-Windows can be slow when connecting off campus).  To run MATLAB without X-Windows type <code>matlab -nodisplay</code>.  You can also run MATLAB using the current terminal for commands and use X-Windows for everything else (like figures) by typing <code>matlab -nodesktop</code>.
+    </note>
+</section>
+
+<section id="thingstotry">
+    <title>MATLAB Commands</title>
+    <para id="ohnoes">MATLAB works with matrices and therefore treats all variables as a matrix.  To enter the matrix 
+        <m:math display="block">
+         <m:semantics>
+          <m:mrow>
+           <m:mi>x</m:mi><m:mo>=</m:mo><m:mrow><m:mo>(</m:mo>
+            <m:mrow>
+             <m:mtable>
+              <m:mtr>
+               <m:mtd>
+                <m:mn>3</m:mn>
+               </m:mtd>
+               <m:mtd>
+                <m:mn>1</m:mn>
+               </m:mtd>
+               <m:mtd>
+                <m:mn>5</m:mn>
+               </m:mtd>
+              </m:mtr>
+              <m:mtr>
+               <m:mtd>
+                <m:mn>6</m:mn>
+               </m:mtd>
+               <m:mtd>
+                <m:mn>4</m:mn>
+               </m:mtd>
+               <m:mtd>
+                <m:mn>1</m:mn>
+               </m:mtd>
+              </m:mtr>
+              
+             </m:mtable>
+            </m:mrow>
+           <m:mo>)</m:mo></m:mrow>
+          </m:mrow>
+         <m:annotation encoding="MathType-MTEF">
+         MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadIhacqGH9aqpdaqadaqaauaabeqacmaaaeaacaaIZaaabaGaaGymaaqaaiaaiwdaaeaacaaI2aaabaGaaGinaaqaaiaaigdaaaaacaGLOaGaayzkaaaaaa@3DF1@</m:annotation>
+         </m:semantics>
+        </m:math>
+        type the command <code>x = [3 1 5; 6 4 1]</code>.  We can represent an array with a vector, which is a special case of a matrix.  A vector can be entered in by typing <code>y = [1 2 3]</code>.  Now try entering <code>z = [1 2 3]'</code>. Is the output what you expect?
+    </para>
+    <list list-type="enumerated" id="element-217"><item>
+            Familiarize yourself with the help command. Typing <code>help</code> gives you a list of all help topics. Typing  <code>help &lt;topicname&gt;</code> gives help on a specific MATLAB function. For example, use <code>help plot</code> to learn about the plot command.          
+            <rule type="MATLAB Tips" id="morecmds"><label>MATLAB Tips</label>
+			<title>More useful commands</title>
+			<statement id="idp2362944">
+				<list id="tips1_list_0"><item>
+						<code>whos</code> lists all variables
+                        </item>
+					<item>
+						<code>clear</code> clears all variables
+                        </item>
+				</list>
+			</statement>
+		</rule>
+	</item>
+	<item>
+            Perform the following operations in MATLAB:
+            <list list-type="enumerated" id="element-603">
+			<item>
+                    Generate the following column vectors as MATLAB variables:
+                    <m:math>
+					<m:semantics>
+						<m:mrow>
+							<m:mi>x</m:mi><m:mo>=</m:mo><m:mrow><m:mo>(</m:mo>
+								<m:mrow>
+									<m:mtable>
+										<m:mtr>
+											<m:mtd>
+												<m:mn>2</m:mn>
+											</m:mtd>
+										</m:mtr>
+										<m:mtr>
+											<m:mtd>
+												<m:mn>4</m:mn>
+											</m:mtd>
+										</m:mtr>
+									</m:mtable>
+								</m:mrow>
+								<m:mo>)</m:mo></m:mrow>
+						</m:mrow>
+						<m:annotation encoding="MathType-MTEF">
+                     MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadIhacqGH9aqpdaqadaqaauaabeqaceaaaeaacaaIYaaabaGaaGinaaaaaiaawIcacaGLPaaaaaa@3AF5@</m:annotation>
+					</m:semantics>
+				</m:math>
+
+                    and
+                    
+                    <m:math>
+					<m:semantics>
+						<m:mrow>
+							<m:mi>y</m:mi><m:mo>=</m:mo><m:mrow><m:mo>(</m:mo>
+								<m:mrow>
+									<m:mtable>
+										<m:mtr>
+											<m:mtd>
+												<m:mn>3</m:mn>
+											</m:mtd>
+										</m:mtr>
+										<m:mtr>
+											<m:mtd>
+												<m:mn>1</m:mn>
+											</m:mtd>
+										</m:mtr>
+									</m:mtable>
+								</m:mrow>
+								<m:mo>)</m:mo></m:mrow>
+						</m:mrow>
+						<m:annotation encoding="MathType-MTEF">
+                     MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadMhacqGH9aqpdaqadaqaauaabeqaceaaaeaacaaIZaaabaGaaGymaaaaaiaawIcacaGLPaaaaaa@3AF4@</m:annotation>
+					</m:semantics>
+				</m:math>
+			</item>
+			<item>
+                    Using the computer, issue the following MATLAB commands
+                    <code display="block" id="idp3506320">
+x * y'
+x' * y
+x .* y
+                    </code>
+                    Be sure you understand the differences between each of these and you know what the <code>'</code>, <code>*</code>, and <code>.*</code> operators do.
+                </item>
+			<item>
+                    Convince yourself that the answer makes sense by checking the matrix dimension and computing each result by hand.
+                </item>
+		</list>
+	</item>
+	<item>
+		<rule type="MATLAB Tips" id="plotstuff"><label>MATLAB Tips</label>
+			<title>Plot and Subplot</title>
+			<statement id="idp7398032">
+				<para id="plot">The Matlab command <code>plot</code> allows you to graphically display vector data (in our case here, the two signals).  For example, if you had the variables <code>t</code> for time, and <code>y</code> for the signal, typing the command <code>plot(t, y);</code> will display a plot of <code>t</code> vs. <code>y</code>.  See <code>help plot</code> for more information.
+                    </para>
+				<para id="plotlabels">
+                        Annotating your plots is very IMPORTANT!  Here are a few annotation commands.
+                        <list id="noanotherlistohnoes"><item>
+							<code>title('Here is a title');</code> - Adds the text "Here is a title" to the top of the plot.
+                            </item>
+						<item>
+							<code>xlabel('Control Voltage (mV)');</code> - Adds text to the X-axis.
+                            </item>
+						<item>
+							<code>ylabel('Current (mA)');</code> - Adds text to the Y-axis.
+                            </item>
+						<item>
+							<code>grid on;</code> - Adds a grid to the plot.
+                            </item>
+					</list>
+				</para>
+				<para id="subplot">
+                        In order to display multiple plots in one window you must use the <code>subplot</code> command.  This command takes three arguments, <code>subplot(m, n, p)</code>.  The first two breaks the window into a m by n matrix of smaller plot windows.  The third argument, p, selects which plot is active.  
+                    </para>
+				<para id="subplotex">
+                        For example, if we have three signals x, y, and z, that we want to plot against time, t, then we can use the subplot command to produce a single window with three plots stacked on top of each other.
+                        <code display="block" id="idp2630016">
+subplot(3,1,1);
+plot(t,x);
+subplot(3,1,2);
+plot(t,y);
+subplot(3,1,3);
+plot(t,z);      
+                        </code>
+				</para>
+				<para id="moreplot">
+                        See <code>help subplot</code> and <code> help plot</code> for much more information.
+                    </para>
+			</statement>
+		</rule>
+
+
+            Create and plot a signal
+            <m:math>
+			<m:semantics>
+				<m:mrow>
+					<m:msub>
+						<m:mi>x</m:mi>
+						<m:mn>0</m:mn>
+					</m:msub>
+					<m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mi>t</m:mi><m:msup>
+						<m:mi>e</m:mi>
+						<m:mrow>
+							<m:mo>−</m:mo><m:mrow><m:mo>|</m:mo>
+								<m:mi>t</m:mi>
+								<m:mo>|</m:mo></m:mrow>
+						</m:mrow>
+					</m:msup>
+				</m:mrow>
+				<m:annotation encoding="MathType-MTEF">
+             MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadIhadaWgaaWcbaGaaGimaaqabaGccaGGOaGaamiDaiaacMcacqGH9aqpcaWG0bGaamyzamaaCaaaleqabaGaeyOeI0IaaGymamaaemaabaGaamiDaaGaay5bSlaawIa7aaaaaaa@42FA@</m:annotation>
+			</m:semantics>
+		</m:math>
+            over the time range [-10,10] using the following MATLAB commands:
+            <code display="block" id="idp1182256">
+t = -10:0.1:10;
+xo = t .* exp(-abs(t));
+plot(t, xo); grid;
+            </code>
+            The first command defines an array with time values having an 0.1 increment. The ";"
+            is used to suppress printout of the arrays (which are large), and the <code>"grid"</code> command
+            makes the plot easier to read. Now create the signals:
+            <equation id="xsubet"><m:math>
+				<m:apply>
+					<m:eq/>
+					<m:apply>
+						<m:ci>
+							<m:msub>
+								<m:mi>x</m:mi>
+								<m:mi>e</m:mi>
+							</m:msub>
+						</m:ci>
+						<m:ci>t</m:ci>
+					</m:apply>
+					<m:apply>
+						<m:times/>
+						<m:apply>
+							<m:abs/>
+							<m:ci>t</m:ci>
+						</m:apply>
+						<m:apply>
+							<m:power/>
+							<m:ci>e</m:ci>
+							<m:apply>
+								<m:minus/>
+								<m:apply>
+									<m:abs/>
+									<m:ci>t</m:ci>
+								</m:apply>
+							</m:apply>
+						</m:apply>
+					</m:apply>
+				</m:apply>
+			</m:math>
+		</equation>
+		<equation id="xt">
+			<m:math>
+				<m:semantics>
+					<m:mrow>
+						<m:mi>x</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo><m:mo>=</m:mo><m:mn>0.5</m:mn><m:mo>*</m:mo><m:mrow><m:mo>[</m:mo>
+							<m:mrow>
+								<m:msub>
+									<m:mi>x</m:mi>
+									<m:mn>0</m:mn>
+								</m:msub>
+								<m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo><m:mo>+</m:mo><m:msub>
+									<m:mi>x</m:mi>
+									<m:mi>e</m:mi>
+								</m:msub>
+								<m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo>
+							</m:mrow>
+							<m:mo>]</m:mo></m:mrow>
+					</m:mrow>
+					<m:annotation encoding="MathType-MTEF">
+                 MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadIhacaGGOaGaamiDaiaacMcacqGH9aqpcaaIWaGaaiOlaiaaiwdacaGGQaWaamWaaeaacaWG4bWaaSbaaSqaaiaaicdaaeqaaOGaaiikaiaadshacaGGPaGaey4kaSIaamiEamaaBaaaleaacaWGLbaabeaakiaacIcacaWG0bGaaiykaaGaay5waiaaw2faaaaa@4892@</m:annotation>
+				</m:semantics>
+			</m:math>
+		</equation>
+    
+            Plot all signals together using 3 plots stacked on top of each other with the subplot
+            command.
+            <code display="block" id="idp1920720">
+subplot(3,1,1);
+plot(t,xo);
+subplot(3,1,2);
+plot(t,xe);
+subplot(3,1,3);
+plot(t,x);      
+            </code>
+            Note that 
+    
+            <m:math>
+			<m:mrow>
+				<m:msub>
+					<m:mi>x</m:mi>
+					<m:mi>o</m:mi>
+				</m:msub>
+				<m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo>
+			</m:mrow>
+		</m:math>
+    
+            and 
+    
+            <m:math>
+			<m:mrow>
+				<m:msub>
+					<m:mi>x</m:mi>
+					<m:mi>e</m:mi>
+				</m:msub>
+				<m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo>
+			</m:mrow>
+		</m:math>
+    
+            are the odd and even components, respectively, of 
+            
+            <m:math>
+			<m:apply>
+				<m:eq/>
+				<m:apply>
+					<m:ci>x</m:ci>
+					<m:ci>t</m:ci>
+				</m:apply>
+				<m:apply>
+					<m:times/>
+					<m:ci>t</m:ci>
+					<m:apply>
+						<m:power/>
+						<m:ci>e</m:ci>
+						<m:apply>
+							<m:minus/>
+							<m:ci>t</m:ci>
+						</m:apply>
+					</m:apply>
+					<m:apply>
+						<m:ci>u</m:ci>
+						<m:ci>t</m:ci>
+					</m:apply>
+				</m:apply>
+			</m:apply>
+		</m:math>
+	</item>
+	<item>
+		<emphasis>Complex Numbers:</emphasis> One of the strengths of MATLAB is that most of its commands
+            work with complex numbers. Perform the following computations in MATLAB.
+    
+            <list list-type="enumerated" id="element-4abc">
+			<item>
+                    MATLAB recognizes <code>i</code> as an imaginary number.  Try entering <code>sqrt(-1)</code> into MATLAB, does the result make sense?
+                </item>
+			<item>
+                    MATLAB uses the letter <code>i</code> instead of <code>j</code> by default.  Electrical Engineers prefer using <code>j</code> however, and MATLAB will recognize that as well.  Try entering <code>i+j</code>, does this make sense.
+                    <note id="idp2850528">
+                        If you are using complex numbers in your code, it's a good idea to avoid using <code>i</code> and <code>j</code> as variables to prevent confusion.
+                    </note>
+			</item>
+			<item>
+                    Define 
+                    <m:math>
+					<m:mrow>
+						<m:msub>
+							<m:mi>z</m:mi>
+							<m:mn>1</m:mn>
+						</m:msub>
+						<m:mo>=</m:mo><m:mn>1</m:mn><m:mo>+</m:mo><m:mi>j</m:mi>
+					</m:mrow>
+				</m:math>
+                    .
+                    Find the magnitude, phase, real and imaginary parts of 
+    
+                    <m:math>
+					<m:mi>z</m:mi>
+				</m:math>
+    
+                    (using <code display="inline">abs()</code>, <code display="inline">angle()</code>, <code display="inline">real()</code>, <code display="inline">imag()</code>, respectively). Is the phase in radians
+                    or degrees?
+                </item>
+			<item>
+                    Find the magnitude of
+    
+                    <m:math>
+					<m:mrow>
+						<m:msub>
+							<m:mi>z</m:mi>
+							<m:mn>1</m:mn>
+						</m:msub>
+						<m:mo>+</m:mo><m:msub>
+							<m:mi>z</m:mi>
+							<m:mn>2</m:mn>
+						</m:msub>
+					</m:mrow>
+				</m:math>
+    
+                    where 
+    
+                    <m:math>
+					<m:apply>
+						<m:eq/>
+						<m:ci>
+							<m:msub>
+								<m:mi>z</m:mi>
+								<m:mn>2</m:mn>
+							</m:msub>
+						</m:ci>
+						<m:apply>
+							<m:times/>
+							<m:cn>2</m:cn>
+							<m:apply>
+								<m:power/>
+								<m:ci>e</m:ci>
+								<m:apply>
+									<m:divide/>
+									<m:ci>jπ</m:ci>
+									<m:cn>3</m:cn>
+								</m:apply>
+							</m:apply>
+						</m:apply>
+					</m:apply>
+				</m:math>
+			</item>
+			<item>
+                    Compute the value of 
+                    <m:math>
+					<m:semantics>
+						<m:mrow>
+							<m:msup>
+								<m:mi>j</m:mi>
+								<m:mi>j</m:mi>
+							</m:msup>
+						</m:mrow>
+						<m:annotation encoding="MathType-MTEF">
+                     MathType@MTEF@5@5@+=feaafiart1ev1aaatCvAUfeBSjuyZL2yd9gzLbvyNv2CaerbuLwBLnhiov2DGi1BTfMBaeXatLxBI9gBaerbd9wDYLwzYbItLDharqqtubsr4rNCHbGeaGqiVCI8FfYJH8YrFfeuY=Hhbbf9v8qqaqFr0xc9pk0xbba9q8WqFfeaY=biLkVcLq=JHqpepeea0=as0Fb9pgeaYRXxe9vr0=vr0=vqpWqaaeaabiGaciaacaqabeaadaqaaqaaaOqaaiaadQgadaahaaWcbeqaaiaadQgaaaaaaa@37ED@</m:annotation>
+					</m:semantics>
+				</m:math>
+                    . Is the result what you expect?
+                </item>
+		</list>
+	</item>
+	<item>
+		<emphasis>Complex Functions: </emphasis> MATLAB also handles complex time functions in the same
+            way (again, implemented as vectors) . Create a signal
+            <m:math>
+			<m:apply>
+				<m:eq/>
+				<m:apply>
+					<m:ci>
+						<m:msub>
+							<m:mi>x</m:mi>
+							<m:mn>1</m:mn>
+						</m:msub>
+					</m:ci>
+					<m:ci>t</m:ci>
+				</m:apply>
+				<m:apply>
+					<m:times/>
+					<m:ci>t</m:ci>
+					<m:apply>
+						<m:power/>
+						<m:ci>e</m:ci>
+						<m:ci>jt</m:ci>
+					</m:apply>
+				</m:apply>
+			</m:apply>
+		</m:math>
+    
+            over the range [-10,10], as in part 3. Next plot the real and imaginary parts of the
+            signal in two plots, one over the other using the subplot command. Notice that one
+            plot is odd and one is even. Try proving to your self analytically that this is what
+            you would expect.
+            
+        </item>
+	<item>
+		<emphasis>Playing and Plotting a Sound</emphasis> 
+            Load the built-in data named "handel" and play it:
+            <code display="block" id="idp6515488">
+load handel; 
+plot(linspace(0,9,73113),y);
+sound(y);
+            </code>
+	</item>
+</list>   
+    <note id="idp7995264">You can use the <code>clear</code> command in MATLAB to clear all of the varibles</note>
+</section>
+<section id="scriptfiles">
+    <title>Script Files</title>
+    <para id="oneExplanation">
+        Scripts are <code>m-files</code> files that contain a sequence of commands that are executed exactly as if they were manually typed into the MATLAB console.  Script files are useful for writing things in MATLAB that you want to save and run later.  You can enter all the commands into a script file that you can run at a later time, and have the ability to go back and edit it later.
+    </para>
+    <para id="moreIntro">
+        You need to use a text editor to create script files, e.g. <code>Notepad</code> on the PC's (<code>pico</code>, <code>emacs</code>, or <code>vi</code> on Linux machines). MATLAB also has an internal editor that you can start by clicking on a <code>.m</code> file within MATLAB's file browser.  All are easy to learn and will produce text files that MATLAB can read.
+    </para>
+    <para id="a234a">
+        <link resource="dampedCosine.m">Click here</link> to download the <code>dampedCosine.m</code> script and be sure to save it with that name to follow the instructions here exactly. It is very important that script filenames end in <code>.m</code>. Be sure that MATLAB's working directory is set to the location of where you saved the script file.  Type dampedCosine at the MATLAB prompt. Look at the m-file in a text editor and verify that you get the plot predicted in the comment field of the script. 
+        
+        <note id="idp3458400">The <code>%</code> character marks the rest of the line as a comment.</note>
+    </para>
+    <exercise id="dampedcosine">
+        <problem id="idp3530256">
+            <title>Scripts</title>
+            <para id="ajfasdf">
+                Now we are going to edit the <code>dampedCosine.m</code> file to create our own script file. At the top of the file, you will see the following commands
+            </para>
+            <code display="block" id="idp7519936">
+diary 'your_name_Lab1.txt'
+disp('NAME: your name')
+disp('SECTION:your section')
+            </code>
+            
+            <para id="oneMore2">
+                <list list-type="enumerated" id="j3243"><item>
+                        Edit the dampedCosine.m (download from link above) script and enter your name and section where indicated. Save this new version of the script as <code>yourName_dampedCosine.m</code>
+                    </item>
+                    <item>
+                        Edit the script to create a second signal where the cosine with twice the period    (which gives half the frequency) of the first. 
+                    </item>
+                    <item>
+                        Add to the script the commands to plot these together with the first signal on top and the second on the bottom. In other words, you should have a single figure with two different plots, one on top and one on bottom. You will need to use <code>subplot</code> and <code>plot</code>.  Save this plot as <code>yourName_dampedCosine.fig</code>.    
+                    </item>
+                    <item>
+                        Show the TA your dampedCosine plot. What is the period of the cosine?
+                    </item>
+                </list>
+            </para>
+        </problem>
+    </exercise>
+
+    <exercise id="compexp">
+        <problem id="idp9912480">       
+            <title>Complex exponentials</title>
+            <para id="numThree1">Download and run <link resource="compexp.m">compexp.m</link>, which includes a 3-D plot of a complex exponential,
+                <m:math>
+                    <m:apply>
+                        <m:ci>y</m:ci>
+                        <m:ci>t</m:ci>
+                    </m:apply>
+                </m:math>
+                , as well as 2-D magnitude/phase and real/imaginary plots.  You need 2 2-D plots to have the same information as the 3-D plot. How would you change the script to make the oscillation frequency lower by half? How would you change the script to make the decay faster? Show the TA your plots.
+            </para>
+        </problem>      
+    </exercise> 
+    
+</section>
+</content>
+</document>
