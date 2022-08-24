@@ -1,12 +1,13 @@
-<col:collection xmlns="http://cnx.rice.edu/collxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:col="http://cnx.rice.edu/collxml" xml:lang="en">
+<?xml version="1.0"?>
+<col:collection xmlns="http://cnx.rice.edu/collxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:col="http://cnx.rice.edu/collxml" xml:lang="en" authors="University Of Washington Dept. of Electrical Engineering">
   <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
     <md:content-id>col10374</md:content-id>
     <md:title>Continuous Time Linear Systems Laboratory (EE 235)</md:title>
     <md:language>en</md:language>
     <md:license url="http://creativecommons.org/licenses/by/2.0/">Creative Commons Attribution License</md:license>
     <md:uuid>2147c57c-7ba0-45ed-8ee7-b74703beae93</md:uuid>
-<md:slug>continuous-time-linear-systems-laboratory-ee-235</md:slug>
-</metadata>
+    <md:slug>continuous-time-linear-systems-laboratory-ee-235</md:slug>
+  </metadata>
   <col:content>
     <col:subcollection>
       <md:title>Lab 1</md:title>
